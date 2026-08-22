@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile, copyFile } from "node:fs/promises";
+import { mkdir, rm, writeFile, copyFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { site, posts } from "../content/site.mjs";
@@ -20,6 +20,96 @@ const cta = (content) => `${site.ctaBase}&utm_content=${encodeURIComponent(conte
 
 function withCta(html) {
   return html.replaceAll(/__CTA__([a-zA-Z0-9_-]+)/g, (_, content) => cta(content));
+}
+
+function inlineMarkdown(text) {
+  return esc(text)
+    .replaceAll(/`([^`]+)`/g, "<code>$1</code>")
+    .replaceAll(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replaceAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+
+function renderMarkdown(markdown) {
+  const lines = markdown.split(/\r?\n/);
+  const html = [];
+  const toc = [];
+  let listType = "";
+  let inQuote = false;
+  let headingCount = 0;
+
+  const closeList = () => {
+    if (!listType) return;
+    html.push(`</${listType}>`);
+    listType = "";
+  };
+
+  const closeQuote = () => {
+    if (!inQuote) return;
+    html.push("</blockquote>");
+    inQuote = false;
+  };
+
+  for (const line of lines) {
+    if (!line.trim()) {
+      closeList();
+      closeQuote();
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,4})\s+(.+)$/);
+    if (heading) {
+      closeList();
+      closeQuote();
+      const level = heading[1].length;
+      const text = heading[2].trim();
+      const id = `md-section-${++headingCount}`;
+      if (level >= 2) toc.push({ id, text });
+      html.push(`<h${level} id="${id}">${inlineMarkdown(text)}</h${level}>`);
+      continue;
+    }
+
+    if (line.startsWith("> ")) {
+      closeList();
+      if (!inQuote) {
+        html.push("<blockquote>");
+        inQuote = true;
+      }
+      html.push(`<p>${inlineMarkdown(line.slice(2).trim())}</p>`);
+      continue;
+    }
+
+    const unordered = line.match(/^-\s+(.+)$/);
+    if (unordered) {
+      closeQuote();
+      if (listType !== "ul") {
+        closeList();
+        html.push("<ul>");
+        listType = "ul";
+      }
+      html.push(`<li>${inlineMarkdown(unordered[1].trim())}</li>`);
+      continue;
+    }
+
+    const ordered = line.match(/^\d+\.\s+(.+)$/);
+    if (ordered) {
+      closeQuote();
+      if (listType !== "ol") {
+        closeList();
+        html.push("<ol>");
+        listType = "ol";
+      }
+      html.push(`<li>${inlineMarkdown(ordered[1].trim())}</li>`);
+      continue;
+    }
+
+    closeList();
+    closeQuote();
+    html.push(`<p>${inlineMarkdown(line.trim())}</p>`);
+  }
+
+  closeList();
+  closeQuote();
+  return { html: html.join("\n"), toc };
 }
 
 function layout({ title, description, current = "/", body, toc = "", canonical = "/" }) {
@@ -110,12 +200,22 @@ function renderHome() {
 }
 
 function renderPost(post) {
-  const tocItems = post.sections
-    .map((section, index) => `<a href="#section-${index + 1}">${section.h2}</a>`)
-    .join("");
+  const tocItems = post.markdownToc
+    ? post.markdownToc.map((item) => `<a href="#${item.id}">${item.text}</a>`).join("")
+    : post.sections.map((section, index) => `<a href="#section-${index + 1}">${section.h2}</a>`).join("");
   const related = posts
     .filter((p) => p.slug !== post.slug && (p.category === post.category || p.tags.some((tag) => post.tags.includes(tag))))
     .slice(0, 3);
+  const postContent = post.markdownHtml
+    ? `<section class="article-section markdown-body">${withCta(post.markdownHtml)}</section>`
+    : post.sections
+        .map(
+          (section, index) => `<section id="section-${index + 1}" class="article-section">
+          <h2>${section.h2}</h2>
+          ${withCta(section.html)}
+        </section>`
+        )
+        .join("");
   const body = `<article class="article">
     <header class="article-header">
       ${post.pinned ? `<span class="pin">置顶</span>` : ""}
@@ -128,14 +228,7 @@ function renderPost(post) {
       <a href="${cta(`${post.slug}_top_notice`)}" target="_blank" rel="noopener">www.goplus.pro</a>
       <span>支持国内主流支付方式，适合没有海外卡或官方支付失败的用户。</span>
     </div>
-    ${post.sections
-      .map(
-        (section, index) => `<section id="section-${index + 1}" class="article-section">
-          <h2>${section.h2}</h2>
-          ${withCta(section.html)}
-        </section>`
-      )
-      .join("")}
+    ${postContent}
     <section class="final-cta">
       <h2>准备开通 ChatGPT Plus / Pro？</h2>
       <p>如果你已经明确要订阅，可以直接进入自助开通入口。</p>
@@ -245,6 +338,14 @@ async function writePage(route, html) {
 }
 
 async function main() {
+  for (const post of posts) {
+    if (!post.markdownFile) continue;
+    const markdown = await readFile(path.join(root, post.markdownFile), "utf8");
+    const rendered = renderMarkdown(markdown);
+    post.markdownHtml = rendered.html;
+    post.markdownToc = rendered.toc;
+  }
+
   await rm(outDir, { recursive: true, force: true });
   await mkdir(path.join(outDir, "assets"), { recursive: true });
   await copyFile(path.join(root, "src", "style.css"), path.join(outDir, "assets", "style.css"));

@@ -1,5 +1,18 @@
 export const extraPosts = [
   {
+    slug: "chatgpt-plus-recharge-2026-alipay-wechat",
+    title: "2026年ChatGPT Plus充值教程：国内如何用支付宝、微信开通会员？",
+    description:
+      "国内用户开通 ChatGPT Plus 的四种常见方式：第三方卡密充值、虚拟信用卡、苹果 App Store 礼品卡和共享账号。",
+    date: "2026-08-23",
+    updated: "2026-08-23",
+    category: "开通教程",
+    tags: ["ChatGPT Plus", "支付宝", "微信", "充值教程", "卡密充值"],
+    pinned: true,
+    readingMinutes: 10,
+    markdownFile: "content/original-posts/chatgpt-plus-recharge-2026-alipay-wechat.md"
+  },
+  {
     slug: "chatgpt-plus-domestic-payment-2026",
     title: "2026 国内开通 ChatGPT Plus：先看这份支付路径整理",
     description:

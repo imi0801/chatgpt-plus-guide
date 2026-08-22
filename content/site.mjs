@@ -7,6 +7,7 @@ export const site = {
   description:
     "面向国内用户的 ChatGPT Plus 和 ChatGPT Pro 开通教程，覆盖订阅流程、支付被拒、无海外信用卡、Plus 与 Pro 区别等问题。",
   baseUrl: "https://imi0801.github.io/chatgpt-plus-guide",
+  googleSiteVerification: "9tqSXTyupED9ZY-GMXMI43IVjP7X1B4ae0SKujMCWJs",
   ctaBase:
     "https://www.goplus.pro?utm_source=github_pages&utm_medium=referral&utm_campaign=chatgpt_plus_guide",
   nav: [

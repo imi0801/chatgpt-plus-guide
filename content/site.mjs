@@ -1,3 +1,5 @@
+import { extraPosts } from "./extra-posts.mjs";
+
 export const site = {
   title: "ChatGPT Plus 国内开通教程",
   subtitle: "ChatGPT Plus / Pro 订阅、支付被拒、无海外卡解决方案",
@@ -16,7 +18,7 @@ export const site = {
   ]
 };
 
-export const posts = [
+const basePosts = [
   {
     slug: "chatgpt-plus",
     title: "国内开通 ChatGPT Plus 保姆级教程：没有海外卡也能解决订阅问题",
@@ -263,3 +265,5 @@ export const posts = [
     ]
   }
 ];
+
+export const posts = [...basePosts, ...extraPosts];

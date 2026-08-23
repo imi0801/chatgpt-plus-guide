@@ -140,7 +140,7 @@ function layout({ title, description, current = "/", body, toc = "", canonical =
   ${site.googleSiteVerification ? `<meta name="google-site-verification" content="${esc(site.googleSiteVerification)}">` : ""}
   <link rel="stylesheet" href="/assets/style.css">
 </head>
-<body>
+<body class="${toc ? "has-toc" : "no-toc"}">
   <aside class="sidebar">
     <a class="brand" href="/">
       <span class="brand-title">${site.title}</span>

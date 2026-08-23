@@ -29,13 +29,14 @@ function inlineMarkdown(text) {
     .replaceAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 }
 
-function renderMarkdown(markdown) {
+function renderMarkdown(markdown, { title = "" } = {}) {
   const lines = markdown.split(/\r?\n/);
   const html = [];
   const toc = [];
   let listType = "";
   let inQuote = false;
   let headingCount = 0;
+  let skippedTitle = false;
 
   const closeList = () => {
     if (!listType) return;
@@ -62,8 +63,12 @@ function renderMarkdown(markdown) {
       closeQuote();
       const level = heading[1].length;
       const text = heading[2].trim();
+      if (!skippedTitle && level === 1 && text === title) {
+        skippedTitle = true;
+        continue;
+      }
       const id = `md-section-${++headingCount}`;
-      if (level >= 2) toc.push({ id, text });
+      if (level === 2) toc.push({ id, text });
       html.push(`<h${level} id="${id}">${inlineMarkdown(text)}</h${level}>`);
       continue;
     }
@@ -341,7 +346,7 @@ async function main() {
   for (const post of posts) {
     if (!post.markdownFile) continue;
     const markdown = await readFile(path.join(root, post.markdownFile), "utf8");
-    const rendered = renderMarkdown(markdown);
+    const rendered = renderMarkdown(markdown, { title: post.title });
     post.markdownHtml = rendered.html;
     post.markdownToc = rendered.toc;
   }

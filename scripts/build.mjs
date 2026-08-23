@@ -17,9 +17,28 @@ const stripHtml = (html) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").t
 const postUrl = (post) => `/${post.slug}/`;
 const absUrl = (url) => new URL(url.replace(/^\//, ""), `${site.baseUrl}/`).toString();
 const cta = (content) => `${site.ctaBase}&utm_content=${encodeURIComponent(content)}`;
+const latestUpdated = posts.reduce((latest, post) => (post.updated > latest ? post.updated : latest), "1970-01-01");
 
 function withCta(html) {
   return html.replaceAll(/__CTA__([a-zA-Z0-9_-]+)/g, (_, content) => cta(content));
+}
+
+function jsonLd(data) {
+  return `<script type="application/ld+json">${JSON.stringify(data).replaceAll("</", "<\\/")}</script>`;
+}
+
+function relatedPosts(post, limit = 4) {
+  return posts
+    .filter((candidate) => candidate.slug !== post.slug)
+    .map((candidate) => {
+      const sharedTags = candidate.tags.filter((tag) => post.tags.includes(tag)).length;
+      const categoryScore = candidate.category === post.category ? 2 : 0;
+      return { post: candidate, score: sharedTags + categoryScore };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || b.post.updated.localeCompare(a.post.updated))
+    .slice(0, limit)
+    .map((item) => item.post);
 }
 
 function inlineMarkdown(text) {
@@ -117,12 +136,13 @@ function renderMarkdown(markdown, { title = "" } = {}) {
   return { html: html.join("\n"), toc };
 }
 
-function layout({ title, description, current = "/", body, toc = "", canonical = "/" }) {
+function layout({ title, description, current = "/", body, toc = "", canonical = "/", type = "article", structuredData = [] }) {
   const pageTitle = title === site.title ? title : `${title} | ${site.title}`;
   const canonicalUrl = absUrl(canonical);
   const nav = site.nav
     .map((item) => `<a class="${current === item.href ? "active" : ""}" href="${item.href}">${item.label}</a>`)
     .join("");
+  const structuredDataHtml = structuredData.map(jsonLd).join("\n  ");
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -132,12 +152,13 @@ function layout({ title, description, current = "/", body, toc = "", canonical =
   <title>${esc(pageTitle)}</title>
   <meta name="description" content="${esc(description || site.description)}">
   <link rel="canonical" href="${canonicalUrl}">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="${type}">
   <meta property="og:title" content="${esc(pageTitle)}">
   <meta property="og:description" content="${esc(description || site.description)}">
   <meta property="og:url" content="${canonicalUrl}">
   <meta name="twitter:card" content="summary_large_image">
   ${site.googleSiteVerification ? `<meta name="google-site-verification" content="${esc(site.googleSiteVerification)}">` : ""}
+  ${structuredDataHtml}
   <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body class="${toc ? "has-toc" : "no-toc"}">
@@ -200,6 +221,22 @@ function renderHome() {
     description: site.description,
     current: "/",
     canonical: "/",
+    type: "website",
+    structuredData: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: site.title,
+        url: site.baseUrl,
+        description: site.description,
+        inLanguage: "zh-CN",
+        publisher: {
+          "@type": "Organization",
+          name: site.author,
+          url: site.baseUrl
+        }
+      }
+    ],
     body
   });
 }
@@ -208,9 +245,7 @@ function renderPost(post) {
   const tocItems = post.markdownToc
     ? post.markdownToc.map((item) => `<a href="#${item.id}">${item.text}</a>`).join("")
     : post.sections.map((section, index) => `<a href="#section-${index + 1}">${section.h2}</a>`).join("");
-  const related = posts
-    .filter((p) => p.slug !== post.slug && (p.category === post.category || p.tags.some((tag) => post.tags.includes(tag))))
-    .slice(0, 3);
+  const related = relatedPosts(post, 4);
   const postContent = post.markdownHtml
     ? `<section class="article-section markdown-body">${withCta(post.markdownHtml)}</section>`
     : post.sections
@@ -221,6 +256,81 @@ function renderPost(post) {
         </section>`
         )
         .join("");
+  const topicLinks = related.length
+    ? `<nav class="topic-links" aria-label="相关专题">
+      <strong>相关专题</strong>
+      ${related.map((item) => `<a href="${postUrl(item)}">${item.title}</a>`).join("")}
+    </nav>`
+    : "";
+  const articleText = stripHtml(post.markdownHtml || post.sections.map((section) => `${section.h2} ${section.html}`).join(" "));
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.description,
+      datePublished: post.date,
+      dateModified: post.updated,
+      author: {
+        "@type": "Organization",
+        name: site.author
+      },
+      publisher: {
+        "@type": "Organization",
+        name: site.author,
+        url: site.baseUrl
+      },
+      mainEntityOfPage: absUrl(postUrl(post)),
+      url: absUrl(postUrl(post)),
+      articleSection: post.category,
+      keywords: post.tags.join(", "),
+      wordCount: articleText.length,
+      inLanguage: "zh-CN"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "首页",
+          item: absUrl("/")
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: post.category,
+          item: `${absUrl("/categories/")}#${encodeURIComponent(post.category)}`
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: post.title,
+          item: absUrl(postUrl(post))
+        }
+      ]
+    }
+  ];
+  const faqItems = post.sections
+    ? post.sections
+        .filter((section) => /[？?]$/.test(section.h2))
+        .map((section) => ({
+          "@type": "Question",
+          name: section.h2,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: stripHtml(section.html)
+          }
+        }))
+    : [];
+  if (post.category === "常见问题" && faqItems.length) {
+    structuredData.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems
+    });
+  }
   const body = `<article class="article">
     <header class="article-header">
       ${post.pinned ? `<span class="pin">置顶</span>` : ""}
@@ -233,6 +343,7 @@ function renderPost(post) {
       <a href="${cta(`${post.slug}_top_notice`)}" target="_blank" rel="noopener">www.goplus.pro</a>
       <span>支持国内主流支付方式，适合没有海外卡或官方支付失败的用户。</span>
     </div>
+    ${topicLinks}
     ${postContent}
     <section class="final-cta">
       <h2>准备开通 ChatGPT Plus / Pro？</h2>
@@ -241,7 +352,7 @@ function renderPost(post) {
     </section>
     ${
       related.length
-        ? `<section class="related"><h2>相关阅读</h2>${related.map(postCard).join("")}</section>`
+        ? `<section class="related"><h2>相关阅读</h2>${related.slice(0, 3).map(postCard).join("")}</section>`
         : ""
     }
   </article>`;
@@ -251,6 +362,7 @@ function renderPost(post) {
     description: post.description,
     current: "",
     canonical: postUrl(post),
+    structuredData,
     toc: `<h3>文章目录</h3>${tocItems}`,
     body
   });
@@ -375,7 +487,13 @@ async function main() {
   await writeFile(
     path.join(outDir, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls
-      .map((url) => `  <url><loc>${absUrl(url)}</loc></url>`)
+      .map((url) => {
+        const post = posts.find((item) => postUrl(item) === url);
+        const lastmod = post?.updated || latestUpdated;
+        const priority = url === "/" ? "1.0" : post ? "0.8" : "0.5";
+        const changefreq = url === "/" ? "daily" : post ? "weekly" : "monthly";
+        return `  <url><loc>${absUrl(url)}</loc><lastmod>${lastmod}</lastmod><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+      })
       .join("\n")}\n</urlset>\n`
   );
   await writeFile(path.join(outDir, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${absUrl("/sitemap.xml")}\n`);

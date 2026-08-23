@@ -368,6 +368,38 @@ body.has-toc .main {
   font-weight: 900;
 }
 
+.topic-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: center;
+  margin: -16px 0 28px;
+  padding: 14px 0 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.topic-links strong {
+  margin-right: 4px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.topic-links a {
+  display: inline-flex;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.topic-links a:hover {
+  background: #ecfeff;
+  color: #0f766e;
+  text-decoration: none;
+}
+
 .article-section {
   padding: 18px 0;
   border-top: 1px solid var(--line);

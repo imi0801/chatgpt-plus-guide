@@ -143,6 +143,15 @@ function layout({ title, description, current = "/", body, toc = "", canonical =
     .map((item) => `<a class="${current === item.href ? "active" : ""}" href="${item.href}">${item.label}</a>`)
     .join("");
   const structuredDataHtml = structuredData.map(jsonLd).join("\n  ");
+  const analyticsHtml = site.googleAnalyticsId
+    ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(site.googleAnalyticsId)}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${esc(site.googleAnalyticsId)}');
+  </script>`
+    : "";
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -159,6 +168,7 @@ function layout({ title, description, current = "/", body, toc = "", canonical =
   <meta name="twitter:card" content="summary_large_image">
   ${site.googleSiteVerification ? `<meta name="google-site-verification" content="${esc(site.googleSiteVerification)}">` : ""}
   ${structuredDataHtml}
+  ${analyticsHtml}
   <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body class="${toc ? "has-toc" : "no-toc"}">

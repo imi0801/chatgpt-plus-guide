@@ -17,3 +17,14 @@ if (headings.length && tocLinks.length) {
 
   headings.forEach((heading) => observer.observe(heading));
 }
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest('a[href*="www.goplus.pro"]');
+  if (!link || typeof window.gtag !== "function") return;
+
+  window.gtag("event", "outbound_click", {
+    event_category: "engagement",
+    event_label: link.href,
+    link_url: link.href
+  });
+});

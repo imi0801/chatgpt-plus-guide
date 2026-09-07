@@ -1,3 +1,5 @@
+# GitHub project deployment: submit sitemap directly in Search Console.
+# Crawlers read https://imi0801.github.io/robots.txt, not this project-path file.
 User-agent: *
 Allow: /
 Sitemap: https://imi0801.github.io/chatgpt-plus-guide/sitemap.xml

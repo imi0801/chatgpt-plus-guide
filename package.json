@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "python3 -m http.server 4173 -d docs"
+    "dev": "python3 -m http.server 4173 -d docs",
+    "test": "npm run build && python3 scripts/check-seo.py && node scripts/check-tracking.mjs"
   }
 }

@@ -1,92 +1,44 @@
-# ChatGPT Plus GitHub Pages 引流站
+# ChatGPT Plus 开通与充值指南
 
-这是一个仿 Hexo / NexT 风格的静态博客站，适合部署到 GitHub Pages。
+Google 中文搜索导流站，沿用 GitHub Pages 项目地址：
+https://imi0801.github.io/chatgpt-plus-guide/
 
-## 本地生成
+## 开发与验证
 
-```bash
+需要 Node.js 18+ 和 Python 3，无 npm 依赖。
+
+```sh
 npm run build
-```
-
-生成后的静态文件在：
-
-```text
-docs/
-```
-
-## 本地预览
-
-```bash
+npm test
 npm run dev
 ```
 
-打开：
+预览地址 http://localhost:4173/ 。构建产物在 `docs/`；请通过源文件修改，不直接改生成的 HTML。
 
-```text
-http://localhost:4173
-```
+- `content/site.mjs`：站点、导航、分析 ID、Plus / Pro 商品入口配置。
+- `content/revised-posts.mjs`：核心文章正文、来源与事实核验日期。
+- `content/extra-posts.mjs`：全部文章基础信息与其他文章正文；同 slug 的核心文章会覆盖基础字段。
+- `content/pages.mjs`：关于、商业关系、编辑说明及隐私页面。
+- `scripts/build.mjs`：静态页面、canonical、索引控制、站点地图和结构化数据。
+- `src/`：样式与导流点击事件。
 
-## 修改站点内容
+文章支持 `seoTitle`（不追加站名）、`noindex`、`showCta`、`product`（plus/pro）、`sources`、`checkedAt`、`updated`。日期仅在实际修改或核验后手动更新。原 Markdown 充值文章已迁入核心正文，不再维护两份内容。
 
-主要改这个文件：
+## 发布
 
-```text
-content/site.mjs
-```
+保持 GitHub Pages 设置：main 分支，`/docs` 目录。合并代码前运行 `npm test`，提交源码与重新构建的 `docs/`。当前 GitHub OAuth 授权缺少 workflow scope，自动检查模板保存在 `operations/seo-check.workflow-example.yml`；由具备相应权限的维护者放入 `.github/workflows/seo-check.yml` 后启用。模板同时验证构建输出与已提交产物一致。原有文章 URL 全部保留。
 
-里面包含：
+本次变更在独立分支审核；合并到 main 才触发现有 Pages 发布。撤回时使用 Git revert 回退对应提交并重新发布，不重写历史。
 
-- 站点标题
-- GitHub Pages 默认域名
-- goplus.pro 引流链接
-- 文章列表
-- 分类和标签
-- 每篇文章正文
+## 抓取和索引
 
-## 发布到 GitHub Pages
+- HTML 已包含完整正文，不依赖客户端渲染。
+- 归档、标签、分类与 HTML 导航地图使用 `noindex, follow`，不进入 XML sitemap。
+- XML sitemap 仅包含可索引规范网址；不使用 priority 或 changefreq 作为排名手段。
+- 404 无首页 canonical，返回首页与资源链接用绝对项目地址，支持深层错误网址。
+- GitHub 项目子目录 robots.txt 只是部署说明。Google 实际读取的是 `https://imi0801.github.io/robots.txt`；根目录缺失 robots 不代表禁止抓取。
+- 直接向 Search Console 提交 `https://imi0801.github.io/chatgpt-plus-guide/sitemap.xml`。本仓库没有域名根目录控制权限，不修改其他站点。
 
-推荐仓库名：
+## 统计与上线复盘
 
-```text
-chatgpt-plus-guide
-```
-
-发布后默认地址类似：
-
-```text
-https://你的用户名.github.io/chatgpt-plus-guide/
-```
-
-如果仓库名不同，需要修改：
-
-```js
-baseUrl: "https://你的用户名.github.io/你的仓库名"
-```
-
-然后重新运行：
-
-```bash
-npm run build
-```
-
-GitHub Pages 设置：
-
-```text
-Settings -> Pages -> Build and deployment -> Deploy from a branch
-Branch: main
-Folder: /docs
-```
-
-## SEO 提交
-
-发布后提交到 Search Console：
-
-```text
-https://你的用户名.github.io/chatgpt-plus-guide/
-```
-
-站点地图：
-
-```text
-https://你的用户名.github.io/chatgpt-plus-guide/sitemap.xml
-```
+执行步骤和未完成的外部接入见 [SEO 运维说明](operations/seo-runbook.md)。本地测试不代表 Search Console 已收录、GA4 实时数据已收到或订单已回传。

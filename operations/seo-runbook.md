@@ -24,9 +24,9 @@
 
 保留原自定义事件 `outbound_click`，参数为 `article_id`、`cta_position`、`product`、`link_url`。`link_url` 只含目标域名和路径，不包含任意查询串。普通页脚外链不算商品导流。右键不计数，中键计一次；键盘激活跟随浏览器 click。
 
-在 GA4 创建事件范围自定义维度：article_id、cta_position、product。用 DebugView/实时报告点击首页 Plus、首页 Pro、Plus 文章和 Pro 文章的入口：每次操作恰好一条 outbound_click，产品和目标路径对应。增强衡量的 `click` 是另一事件，报表不能与 outbound_click 相加计算导流量。未用订单验证前不把该事件命名为 purchase。
+在 GA4 创建事件范围自定义维度：article_id、cta_position、product。用 DebugView/实时报告点击首页首屏自助小店、首页 Plus、首页 Pro、Plus 文章和 Pro 文章的入口：每次操作恰好一条 outbound_click，产品和目标路径对应。增强衡量的 `click` 是另一事件，报表不能与 outbound_click 相加计算导流量。未用订单验证前不把该事件命名为 purchase。
 
-现有来源参数保留：utm_source=github_pages、utm_medium=referral、utm_campaign=chatgpt_plus_guide；utm_content=文章标识__位置。目标站应保留这些参数用于归因。
+现有来源参数保留：utm_source=github_pages、utm_medium=referral、utm_campaign=chatgpt_plus_guide；utm_content=文章标识__位置。目标站应保留这些参数用于归因。首页首屏可直接进入 `https://fe.dtyuedan.cn/shop/panghu`，事件 product=recharge、cta_position=hero_recharge；该点击仍不代表支付成功。
 
 ## 3. goplus.pro 与订单承接（需要目标站权限）
 

@@ -13,7 +13,9 @@ function trackProductClick(event) {
   const link = event.target.closest?.('a[data-cta][data-product]');
   if (!link || typeof window.gtag !== 'function') return;
   const url = new URL(link.href, location.href);
-  if (url.origin !== 'https://www.goplus.pro') return;
+  const isProductPage = url.origin === 'https://www.goplus.pro';
+  const isRechargeShop = url.origin === 'https://fe.dtyuedan.cn' && url.pathname === '/shop/panghu';
+  if (!isProductPage && !isRechargeShop) return;
   // Preserve the existing custom event name; GA4's automatic "click" is separate.
   // Only allowlisted identifiers are sent, never arbitrary query strings/session data.
   window.gtag('event', 'outbound_click', {

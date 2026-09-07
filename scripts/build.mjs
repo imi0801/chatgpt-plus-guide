@@ -72,7 +72,9 @@ function home() {
     ['比较 Plus 和 Pro', '查看价格、额度和升级判断', 'plus-vs-pro'],
   ];
   return layout({title:site.title, description:site.description, structuredData:[{'@context':'https://schema.org','@type':'WebSite',name:site.title,url:absUrl('/'),inLanguage:'zh-CN'}],body:`
-<section class="hero"><p class="eyebrow">ChatGPT 订阅指南</p><h1>ChatGPT Plus 怎么开通？<br>从你的问题开始</h1><p>查看购买条件、充值流程和支付排查。先弄清费用、账号信息要求与后续管理，再决定是否订阅。</p><div class="route-grid">${routes.map(([title,desc,slug])=>`<a class="route-card" href="/${slug}/"><strong>${title}</strong><span>${desc}</span></a>`).join('')}</div></section>
+<section class="hero"><p class="eyebrow">ChatGPT 订阅指南</p><h1>ChatGPT Plus 怎么开通？<br>从你的问题开始</h1>
+<div class="hero-recharge"><div><strong>GoPlus 自助充值入口</strong><p>微信 / 支付宝付款，前往小店选择套餐并下单。</p></div>${ctaLink('recharge','home','hero_recharge','button primary recharge-button')}</div>
+<p>查看购买条件、充值流程和支付排查。先弄清费用、账号信息要求与后续管理，再决定是否订阅。</p><div class="route-grid">${routes.map(([title,desc,slug])=>`<a class="route-card" href="/${slug}/"><strong>${title}</strong><span>${desc}</span></a>`).join('')}</div></section>
 <section class="content-section"><h2>购买前先核对</h2><p>官方支持地区、付款条件和第三方交付是不同的事项。第三方充值不会改变官方地区限制；需要提交的 Session 可能包含敏感会话凭据。</p><p><a href="/chatgpt-plus-domestic-payment-2026/">比较购买渠道</a> · <a href="/chatgpt-plus-account-safety/">了解账号信息风险</a></p></section>
 <section class="content-section"><h2>核心教程</h2>${featured.map(slug=>postCard(posts.find(p=>p.slug===slug))).join('')}<a href="/archives/">浏览全部文章</a></section>
 <section class="content-section"><h2>已确定需要购买？</h2><p>前往 GoPlus 查看第三方报价、库存和交付条件。Plus 可查看自助购买条件，Pro 先咨询具体档位。</p><div class="hero-actions">${ctaLink('plus','home','product')}${ctaLink('pro','home','product','button')}</div></section>`});

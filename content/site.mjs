@@ -36,8 +36,12 @@ export const site = {
     }
   ],
   "shortName": "AI 订阅指南",
-  "updated": "2026-09-07",
+  "updated": "2026-09-08",
   "products": {
+    "recharge": {
+      "url": "https://fe.dtyuedan.cn/shop/panghu",
+      "label": "立即自助充值 →"
+    },
     "plus": {
       "url": "https://www.goplus.pro/chatgpt-plus-recharge",
       "label": "查看 Plus 套餐与购买条件"

@@ -15,14 +15,14 @@ npm run dev
 
 预览地址 http://localhost:4173/ 。构建产物在 `docs/`；请通过源文件修改，不直接改生成的 HTML。
 
-- `content/site.mjs`：站点、导航、分析 ID、Plus / Pro 商品入口配置。
+- `content/site.mjs`：站点、导航、分析 ID、Plus / Pro 商品与首页自助充值入口配置。
 - `content/revised-posts.mjs`：核心文章正文、来源与事实核验日期。
 - `content/extra-posts.mjs`：全部文章基础信息与其他文章正文；同 slug 的核心文章会覆盖基础字段。
 - `content/pages.mjs`：关于、商业关系、编辑说明及隐私页面。
 - `scripts/build.mjs`：静态页面、canonical、索引控制、站点地图和结构化数据。
 - `src/`：样式与导流点击事件。
 
-文章支持 `seoTitle`（不追加站名）、`noindex`、`showCta`、`product`（plus/pro）、`sources`、`checkedAt`、`updated`。日期仅在实际修改或核验后手动更新。原 Markdown 充值文章已迁入核心正文，不再维护两份内容。
+文章支持 `seoTitle`（不追加站名）、`noindex`、`showCta`、`product`（plus/pro/recharge）、`sources`、`checkedAt`、`updated`。日期仅在实际修改或核验后手动更新。原 Markdown 充值文章已迁入核心正文，不再维护两份内容。
 
 ## 发布
 

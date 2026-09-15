@@ -215,10 +215,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-billing-address",
-    "title": "ChatGPT Plus 账单地址怎么填？别再随便复制一个地址",
-    "description": "讲清楚 ChatGPT Plus 付款时账单地址、邮编、卡片发行地区和网络地区为什么要一致，以及失败后怎么处理。",
+    "title": "ChatGPT 账单地址怎么填？可以填中国吗、能不能随便填",
+    "description": "账单地址应与发卡机构登记信息一致。说明可不可以填中国、随便填会有什么后果，以及被拒后怎么核对。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "支付问题",
     "tags": [
       "账单地址",
@@ -245,10 +245,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-renewal-failed",
-    "title": "ChatGPT Plus 续费失败怎么办？先确认这几件事",
-    "description": "ChatGPT Plus 或 Pro 续费失败后的排查顺序，包括银行拦截、账号登录方式、卡片状态和恢复购买。",
+    "title": "ChatGPT 续费失败提示「你的银行卡被拒绝了」怎么办",
+    "description": "ChatGPT 续费失败并提示银行卡被拒绝时，先确认扣款方式是否仍然有效，再按原购买渠道处理，避免订阅中断。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "支付问题",
     "tags": [
       "续费失败",
@@ -287,10 +287,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-own-account-vs-shared",
-    "title": "ChatGPT Plus 开在自己账号上，和共享账号差别到底在哪",
-    "description": "从数据、隐私、稳定性、工作流和长期成本角度，对比自有 ChatGPT Plus 账号与共享账号。",
+    "title": "ChatGPT Plus 能几个人一起用？共享、合租和自己账号的区别",
+    "description": "说明 ChatGPT Plus 是否支持多人同时使用，以及合租、共享账号在账单、记录和账号安全上的实际差别。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "账号安全",
     "tags": [
       "共享账号",
@@ -385,10 +385,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-for-students",
-    "title": "学生党要不要开 ChatGPT Plus？看这几个真实场景",
-    "description": "面向学生用户分析 ChatGPT Plus 是否值得开，覆盖论文资料、语言学习、代码作业和预算判断。",
+    "title": "ChatGPT Plus 有学生优惠吗？学生认证方式与学生党值不值得开",
+    "description": "说明 ChatGPT Plus 目前有没有学生专属折扣、学生认证一般怎么做，以及按课业强度判断学生党值不值得订阅。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "使用建议",
     "tags": [
       "学生党",
@@ -475,10 +475,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-mobile-app-vs-web",
-    "title": "ChatGPT Plus 用 App 订阅还是网页订阅？国内用户怎么选",
-    "description": "对比 ChatGPT Plus 在网页端、iOS、Android 订阅的差异，说明账单管理、恢复购买和国内支付注意事项。",
+    "title": "苹果 / 安卓手机怎么订阅 ChatGPT Plus？App 内订阅和网页订阅的区别",
+    "description": "比较 iPhone、安卓 App 内订阅与网页订阅的付款方式、价格差异、账单归属和取消入口，避免重复订阅。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "开通教程",
     "tags": [
       "App 订阅",
@@ -517,10 +517,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-common-errors",
-    "title": "ChatGPT Plus 订阅常见报错：declined、authentication、unavailable 怎么看",
-    "description": "整理 ChatGPT Plus 订阅过程中常见英文报错的含义和处理顺序，适合支付页面卡住的新手。",
+    "title": "ChatGPT 付款报错对照表：每条提示原文、含义和处理办法",
+    "description": "把 ChatGPT 订阅时常见的英文报错逐条列出：原文、含义、可能原因和对应处理，便于按提示直接定位问题。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "支付问题",
     "tags": [
       "英文报错",
@@ -551,10 +551,10 @@ export const supportingPosts = [
   },
   {
     "slug": "chatgpt-plus-workflow",
-    "title": "开通 ChatGPT Plus 后，第一周应该怎么用才不浪费",
-    "description": "给 ChatGPT Plus 新用户的一周使用计划，帮助把订阅真正用到学习、办公、写作、资料整理和自动化上。",
+    "title": "ChatGPT Plus 值得买吗？按 5 类用户给出结论",
+    "description": "按学生、上班族、自由职业、开发者和轻度用户五类场景，判断 ChatGPT Plus 值不值得买，并给出替代方案。",
     "date": "2026-08-22",
-    "updated": "2026-09-07",
+    "updated": "2026-09-15",
     "category": "使用建议",
     "tags": [
       "新手使用",
@@ -611,6 +611,41 @@ export const supportingPosts = [
         "html": "<p><strong>16. Plus 适合学生吗？</strong> 如果经常读资料、写论文、学代码，值得考虑。</p>\n        <p><strong>17. 上班族怎么用回本？</strong> 从会议纪要、邮件、方案、表格和资料总结开始。</p>\n        <p><strong>18. Pro 适合谁？</strong> 适合高频、复杂、强依赖 ChatGPT 的用户。</p>\n        <p><strong>19. 免费版还能用吗？</strong> 能，轻量用户先用免费版也合理。</p>\n        <p><strong>20. 权益会变吗？</strong> 会，模型和额度以账号页面显示为准。</p>"
       }
     ],
+    "product": "plus"
+  },
+  {
+    "slug": "chatgpt-payment-not-approved",
+    "date": "2026-09-15",
+    "category": "支付问题",
+    "tags": ["付款未获批准", "支付被拒", "风控", "3DS"],
+    "product": "plus"
+  },
+  {
+    "slug": "chatgpt-refund",
+    "date": "2026-09-15",
+    "category": "账号安全",
+    "tags": ["退款", "订阅管理", "账单", "售后"],
+    "product": "plus"
+  },
+  {
+    "slug": "chatgpt-cancel-error",
+    "date": "2026-09-15",
+    "category": "账号安全",
+    "tags": ["取消订阅", "报错", "Apple", "Google Play"],
+    "product": "plus"
+  },
+  {
+    "slug": "chatgpt-auto-renew-off",
+    "date": "2026-09-15",
+    "category": "账号安全",
+    "tags": ["自动续费", "取消订阅", "账单", "到期"],
+    "product": "plus"
+  },
+  {
+    "slug": "chatgpt-plus-usage-limits",
+    "date": "2026-09-15",
+    "category": "套餐选择",
+    "tags": ["额度", "使用限制", "ChatGPT Plus", "刷新"],
     "product": "plus"
   }
 ];

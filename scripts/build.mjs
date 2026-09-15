@@ -1,7 +1,7 @@
 import { mkdir, rm, writeFile, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { site, posts } from '../content/site.mjs';
+import { site, posts, redirects } from '../content/site.mjs';
 import { pages } from '../content/pages.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -26,7 +26,13 @@ function ctaLink(product, article, position, className = 'button primary') {
   return `<a class="${className}" data-cta="${position}" data-product="${product}" href="${esc(ctaUrl(product, article, position))}" target="_blank" rel="noopener sponsored">${esc(site.products[product].label)}</a>`;
 }
 function articleHtml(post) {
-  return post.sections.map((s, i) => `<section class="article-section" id="section-${i + 1}"><h2>${esc(s.h2)}</h2>${s.html}</section>`).join('\n');
+  // A single contextual CTA sits mid-article; the closing CTA is rendered separately.
+  const midIndex = post.showCta === false ? -1 : Math.min(3, post.sections.length - 2);
+  return post.sections.map((s, i) => {
+    const block = `<section class="article-section" id="section-${i + 1}"><h2>${esc(s.h2)}</h2>${s.html}</section>`;
+    if (i !== midIndex || !post.midCta) return block;
+    return `${block}<aside class="inline-cta"><p>${post.midCta}</p>${ctaLink(post.product || 'plus', post.slug, 'article_mid', 'button')}</aside>`;
+  }).join('\n');
 }
 function relatedPosts(post) {
   const explicit = new Set(post.sections.flatMap(s => [...s.html.matchAll(/href="\/([^/]+)\/"/g)].map(m => m[1])));
@@ -75,7 +81,7 @@ function home() {
 <section class="hero"><p class="eyebrow">ChatGPT 订阅指南</p><h1>ChatGPT Plus 怎么开通？<br>从你的问题开始</h1>
 <div class="hero-recharge"><div><strong>GoPlus 自助充值入口</strong><p>微信 / 支付宝付款，前往小店选择套餐并下单。</p></div>${ctaLink('recharge','home','hero_recharge','button primary recharge-button')}</div>
 <p>查看购买条件、充值流程和支付排查。先弄清费用、账号信息要求与后续管理，再决定是否订阅。</p><div class="route-grid">${routes.map(([title,desc,slug])=>`<a class="route-card" href="/${slug}/"><strong>${title}</strong><span>${desc}</span></a>`).join('')}</div></section>
-<section class="content-section"><h2>购买前先核对</h2><p>官方支持地区、付款条件和第三方交付是不同的事项。第三方充值不会改变官方地区限制；需要提交的 Session 可能包含敏感会话凭据。</p><p><a href="/chatgpt-plus-domestic-payment-2026/">比较购买渠道</a> · <a href="/chatgpt-plus-account-safety/">了解账号信息风险</a></p></section>
+<section class="content-section"><h2>购买前先核对</h2><p>官方支持地区、付款条件和第三方交付是不同的事项。第三方充值不会改变官方地区限制；需要提交的 Session 可能包含敏感会话凭据。</p><p><a href="/without-credit-card/">比较购买渠道</a> · <a href="/chatgpt-plus-account-safety/">了解账号信息风险</a></p></section>
 <section class="content-section"><h2>核心教程</h2>${featured.map(slug=>postCard(posts.find(p=>p.slug===slug))).join('')}<a href="/archives/">浏览全部文章</a></section>
 <section class="content-section"><h2>已确定需要购买？</h2><p>前往 GoPlus 查看第三方报价、库存和交付条件。Plus 可查看自助购买条件，Pro 先咨询具体档位。</p><div class="hero-actions">${ctaLink('plus','home','product')}${ctaLink('pro','home','product','button')}</div></section>`});
 }
@@ -86,13 +92,18 @@ function renderPost(post) {
     {'@context':'https://schema.org','@type':'BlogPosting',headline:post.title,description:post.description,datePublished:post.date,dateModified:post.updated,author:{'@type':'Organization',name:site.author,url:absUrl('/about/')},publisher:{'@type':'Organization',name:site.author,url:absUrl('/about/')},mainEntityOfPage:absUrl(postUrl(post)),url:absUrl(postUrl(post)),articleSection:post.category,inLanguage:'zh-CN'},
     {'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:'首页',item:absUrl('/')},{'@type':'ListItem',position:2,name:post.title,item:absUrl(postUrl(post))}]}
   ];
+  if (post.faq?.length) {
+    schema.push({'@context':'https://schema.org','@type':'FAQPage',mainEntity:post.faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:stripHtml(a)}}))});
+  }
+  const faqBlock = post.faq?.length ? `<section class="article-section faq-block" id="faq"><h2>${esc(post.faqHeading || '常见追问')}</h2><dl>${post.faq.map(([q,a])=>`<dt>${esc(q)}</dt><dd>${a}</dd>`).join('')}</dl></section>` : '';
+  const changelog = post.changelog?.length ? `<section class="article-section changelog" id="changelog"><h2>更新记录</h2><ul>${post.changelog.map(([d,t])=>`<li><time>${esc(d)}</time>：${esc(t)}</li>`).join('')}</ul></section>` : '';
   const sources = post.sources?.length ? `<section class="sources"><h2>资料来源与核验</h2><p>资料核验于 ${post.checkedAt}。价格、地区与入口可能变化，请同时查看原始说明。</p><ul>${post.sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></section>` : '';
   const related = relatedPosts(post);
-  return layout({title:post.title,seoTitle:post.seoTitle,description:post.description,route:postUrl(post),type:'article',article:post.slug,noindex:post.noindex===true,structuredData:schema,toc:sections.map((s,i)=>`<a href="#section-${i+1}">${esc(s.h2)}</a>`).join(''),body:`<article class="article">
+  return layout({title:post.title,seoTitle:post.seoTitle,description:post.description,route:postUrl(post),type:'article',article:post.slug,noindex:post.noindex===true,structuredData:schema,toc:[...sections.map((s,i)=>`<a href="#section-${i+1}">${esc(s.h2)}</a>`),...(post.faq?.length?[`<a href="#faq">${esc(post.faqHeading || '常见追问')}</a>`]:[]),...(post.changelog?.length?['<a href="#changelog">更新记录</a>']:[])].join(''),body:`<article class="article">
 <nav class="breadcrumbs" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true"> / </span><span>${esc(post.title)}</span></nav>
 <header class="article-header"><h1>${esc(post.title)}</h1><p class="meta">发表于 ${post.date} · 更新于 ${post.updated} · ${esc(post.category)} · 阅读约 ${Math.max(1,Math.ceil(stripHtml(content).length/450))} 分钟</p><p class="meta">作者：<a href="/about/">${esc(site.author)}</a>${post.checkedAt ? ` · 资料核验：${post.checkedAt}` : ''}</p></header>
-<details class="mobile-toc"><summary>本篇目录</summary><nav>${sections.map((s,i)=>`<a href="#section-${i+1}">${esc(s.h2)}</a>`).join('')}</nav></details>
-${content}${sources}
+<details class="mobile-toc"><summary>本篇目录</summary><nav>${sections.map((s,i)=>`<a href="#section-${i+1}">${esc(s.h2)}</a>`).join('')}${post.faq?.length?`<a href="#faq">${esc(post.faqHeading || '常见追问')}</a>`:''}${post.changelog?.length?'<a href="#changelog">更新记录</a>':''}</nav></details>
+${content}${faqBlock}${changelog}${sources}
 ${post.showCta === false ? '' : `<section class="final-cta"><h2>${post.product==='pro'?'需要了解 Pro 交付？':'需要比较 Plus 购买条件？'}</h2><p>以下入口前往 GoPlus 第三方服务。购买前确认账号信息要求、实际价格与售后；提交 Session 可能涉及账号访问风险。</p>${ctaLink(post.product || 'plus',post.slug,'article_end')}</section>`}
 ${related.length ? `<section class="related"><h2>继续阅读</h2>${related.map(postCard).join('')}</section>`:''}</article>`});
 }
@@ -118,6 +129,21 @@ async function writePage(route, html, updated, indexable=true) {
   await writeFile(path.join(dir,'index.html'),portableHtml(route,html));
   if(indexable) publishedRoutes.push({route,updated});
 }
+async function writeRedirect(slug, target, oldTitle) {
+  const targetUrl = absUrl(target);
+  const html = `<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面已合并：${esc(oldTitle)} | ${esc(site.shortName)}</title>
+<meta name="robots" content="noindex, follow">
+<meta name="description" content="${esc(oldTitle)}已合并到新的页面，正在跳转。">
+<meta http-equiv="refresh" content="0; url=${esc(targetUrl)}">
+<link rel="canonical" href="${esc(targetUrl)}">
+</head><body><main><h1>页面已合并：${esc(oldTitle)}</h1><p>这篇内容已并入新的页面。如果没有自动跳转，请点击<a href="${esc(targetUrl)}">前往新地址</a>。</p></main></body></html>`;
+  const dir = path.join(outDir, slug);
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, 'index.html'), html);
+}
+
 async function main() {
   const allSlugs=[...posts,...pages].map(p=>p.slug);
   if(new Set(allSlugs).size!==allSlugs.length) throw new Error('Duplicate page slug');
@@ -131,6 +157,7 @@ async function main() {
   await writePage('/',home(),site.updated);
   for(const p of posts) await writePage(postUrl(p),renderPost(p),p.updated,!p.noindex);
   for(const p of pages) await writePage(`/${p.slug}/`,layout({title:p.title,description:p.description,route:`/${p.slug}/`,article:p.slug,body:`<section class="page"><h1>${esc(p.title)}</h1>${p.html}</section>`}),p.updated);
+  for(const [slug,{target,title}] of redirects) await writeRedirect(slug,target,title);
   for(const route of utilityRoutes) await writePage(route,utilityPage(route),site.updated,false);
   // An absolute project URL keeps links/assets working for unknown nested URLs.
   const notFound=layout({title:'页面不存在',description:'此页面不存在，请回到指南首页。',route:'/404.html',canonical:false,noindex:true,article:'404',body:'<section class="page not-found"><h1>页面不存在</h1><p>请检查网址，或返回首页选择教程。</p><a class="button" href="/">返回首页</a></section>'});
@@ -139,6 +166,6 @@ async function main() {
   // Project-path robots.txt is informational only: crawlers use /robots.txt at the host root.
   await writeFile(path.join(outDir,'robots.txt'),`# GitHub project deployment: submit sitemap directly in Search Console.\n# Crawlers read https://imi0801.github.io/robots.txt, not this project-path file.\nUser-agent: *\nAllow: /\nSitemap: ${absUrl('/sitemap.xml')}\n`);
   await writeFile(path.join(outDir,'.nojekyll'),'');
-  console.log(`Built ${publishedRoutes.length} indexable pages and ${utilityRoutes.length} navigation pages.`);
+  console.log(`Built ${publishedRoutes.length} indexable pages, ${redirects.size} redirects and ${utilityRoutes.length} navigation pages.`);
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

@@ -654,3 +654,15 @@ a:focus-visible, summary:focus-visible, .table-scroll:focus-visible { outline: 3
   .hero-recharge strong { font-size: 22px; }
   .recharge-button { width: 100%; }
 }
+
+/* Mid-article contextual CTA, FAQ block and changelog */
+.inline-cta { margin: 26px 0; padding: 18px 20px; border: 1px solid var(--border, #e2e2e6); border-left: 3px solid var(--accent, #2f6f5e); border-radius: 10px; background: var(--surface, #fafafa); }
+.inline-cta p { margin: 0 0 12px; font-size: 15px; }
+.faq-block dl { margin: 0; }
+.faq-block dt { margin-top: 18px; font-weight: 600; }
+.faq-block dt:first-child { margin-top: 0; }
+.faq-block dd { margin: 6px 0 0; padding-left: 0; }
+.changelog ul { margin: 0; padding-left: 18px; }
+.changelog time { font-variant-numeric: tabular-nums; color: var(--muted, #6b6b73); }
+.lead { font-size: 17px; line-height: 1.75; font-weight: 500; }
+@media (max-width: 860px) { .inline-cta { padding: 16px; } }

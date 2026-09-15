@@ -12,7 +12,7 @@ class Page(HTMLParser):
     def __init__(self, text):
         super().__init__(convert_charrefs=True)
         self.links=[]; self.assets=[]; self.canon=[]; self.ids=set(); self.h1=0
-        self.robots=''; self.title=''; self.description=''; self.ctas=[]; self.schemas=[]
+        self.robots=''; self.title=''; self.description=''; self.ctas=[]; self.schemas=[]; self.refresh=''
         self.capture=None; self.buffer=''
         self.feed(text)
     def handle_starttag(self,tag,attrs):
@@ -24,6 +24,7 @@ class Page(HTMLParser):
         if tag=='title': self.capture='title'; self.buffer=''
         if tag=='script' and a.get('type')=='application/ld+json': self.capture='json'; self.buffer=''
         if tag=='meta' and a.get('name')=='robots': self.robots=a['content']
+        if tag=='meta' and (a.get('http-equiv') or '').lower()=='refresh': self.refresh=a.get('content','')
         if tag=='meta' and a.get('name')=='description': self.description=a['content']
         if tag=='link' and a.get('rel')=='canonical': self.canon.append(a['href'])
         if tag=='link' and a.get('rel')=='stylesheet': self.assets.append(a['href'])
@@ -45,6 +46,13 @@ for file in ROOT.rglob('*.html'):
     p=Page(text); pages[url]=p
     assert p.h1==1 and p.title and p.description, relative
     assert len(p.canon)==(0 if relative=='404.html' else 1), relative
+    if p.refresh:
+        # Merged page: meta refresh + canonical must both point at the surviving URL.
+        assert 'noindex' in p.robots, ('redirect must be noindex', relative)
+        target=p.refresh.split('url=',1)[1].strip()
+        assert p.canon and p.canon[0]==target, ('redirect canonical must match target', relative, p.canon, target)
+        assert target in pages or target.startswith(BASE), (relative, target)
+        continue
     if p.canon: assert p.canon[0]==url, (url,p.canon)
     if relative=='404.html': assert 'noindex' in p.robots
     for cta in p.ctas:
@@ -59,6 +67,7 @@ for file in ROOT.rglob('*.html'):
             assert schema['mainEntityOfPage']==url and schema['dateModified']>=schema['datePublished']
 
 for url,p in pages.items():
+    if p.refresh: continue
     for href in p.links+p.assets:
         target=urlsplit(urljoin(url,href))
         if target.netloc!='imi0801.github.io': continue
@@ -75,7 +84,10 @@ sitemap=ET.parse(ROOT/'sitemap.xml')
 urls=[item.text for item in sitemap.findall('.//s:loc',ns)]
 assert len(urls)==len(set(urls))
 assert set(urls)=={url for url,p in pages.items() if 'noindex' not in p.robots}
-assert len({p.title for p in pages.values()})==len(pages), 'Duplicate titles'
+titles=[p.title for p in pages.values()]
+assert len(set(titles))==len(titles), 'Duplicate titles'
+redirect_targets={p.refresh.split('url=',1)[1].strip() for p in pages.values() if p.refresh}
+assert all(t in pages for t in redirect_targets), ('redirect target missing', redirect_targets-set(pages))
 for route in ['archives/','tags/','categories/','sitemap/']:
     assert 'noindex' in pages[BASE+route].robots
-print(f'PASS: {len(pages)} HTML pages; {len(urls)} canonical sitemap URLs; links, fragments, metadata, schemas, CTA destinations.')
+print(f'PASS: {len(pages)} HTML pages; {sum(1 for p in pages.values() if p.refresh)} merged redirects; {len(urls)} canonical sitemap URLs; links, fragments, metadata, schemas, CTA destinations.')

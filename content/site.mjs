@@ -4,7 +4,7 @@ import { supportingPosts } from './extra-posts.mjs';
 export const site = {
   "title": "ChatGPT Plus 开通与充值指南",
   "subtitle": "ChatGPT Plus / Pro 订阅、支付被拒、无海外卡解决方案",
-  "author": "AI 订阅指南",
+  "author": "ChatGPT 订阅百科",
   "description": "ChatGPT Plus 开通、微信支付宝充值条件、支付失败排查和 Plus / Pro 套餐比较。先了解购买流程、账号信息要求与订阅管理，再选择适合的渠道。",
   "baseUrl": "https://imi0801.github.io/chatgpt-plus-guide",
   "googleSiteVerification": "9tqSXTyupED9ZY-GMXMI43IVjP7X1B4ae0SKujMCWJs",
@@ -35,8 +35,8 @@ export const site = {
       "href": "/chatgpt-plus-cancel-manage/"
     }
   ],
-  "shortName": "AI 订阅指南",
-  "updated": "2026-09-08",
+  "shortName": "ChatGPT 订阅百科",
+  "updated": "2026-09-15",
   "products": {
     "recharge": {
       "url": "https://fe.dtyuedan.cn/shop/panghu",
@@ -53,4 +53,12 @@ export const site = {
   }
 };
 
-export const posts = supportingPosts.map(post => ({ ...post, ...revisedPosts[post.slug] }));
+export const redirects = new Map([
+  ["chatgpt-plus-domestic-payment-2026", { target: "/without-credit-card/", title: "ChatGPT Plus 支付方式对比" }],
+  ["chatgpt-plus-faq-extended", { target: "/faq/", title: "ChatGPT Plus 国内订阅 30 个高频问题" }],
+  ["chatgpt-pro-upgrade-timing", { target: "/plus-vs-pro/", title: "什么时候该从 ChatGPT Plus 升级到 Pro" }],
+]);
+
+export const posts = supportingPosts
+  .filter(post => !redirects.has(post.slug))
+  .map(post => ({ ...post, ...revisedPosts[post.slug] }));

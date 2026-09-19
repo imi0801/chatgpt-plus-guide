@@ -6,7 +6,7 @@ const handlers={},calls=[];
 const context={
   document:{querySelectorAll:()=>[],body:{dataset:{article:'chatgpt-pro'}},addEventListener:(event,handler)=>handlers[event]=handler},
   window:{gtag:(...args)=>calls.push(args)},
-  location:{href:'https://imi0801.github.io/chatgpt-plus-guide/chatgpt-pro/'},URL
+  location:{href:'https://guide.goplus.pro/chatgpt-pro/'},addEventListener:()=>{},innerHeight:800,URL
 };
 vm.runInNewContext(code,context);
 const link={href:'https://www.goplus.pro/chatgpt-pro-recharge?utm_content=test&session=DO_NOT_SEND',dataset:{cta:'article_end',product:'pro'}};

@@ -6,8 +6,9 @@ import json
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1] / 'docs'
-BASE = 'https://imi0801.github.io/chatgpt-plus-guide/'
-PREFIX = '/chatgpt-plus-guide/'
+import subprocess
+BASE = subprocess.check_output(['node','-e',"import('./content/site.mjs').then(m=>process.stdout.write(m.site.baseUrl+'/'))"],cwd=Path(__file__).resolve().parents[1]).decode()
+PREFIX = urlsplit(BASE).path
 class Page(HTMLParser):
     def __init__(self, text):
         super().__init__(convert_charrefs=True)
@@ -45,6 +46,9 @@ for file in ROOT.rglob('*.html'):
     assert '__CTA__' not in text, relative
     p=Page(text); pages[url]=p
     assert p.h1==1 and p.title and p.description, relative
+    if not p.refresh and 'noindex' not in p.robots:
+        assert len(p.description)<=160, ('description too long', relative, len(p.description))
+        assert len(p.title)<=60, ('title too long', relative, len(p.title))
     assert len(p.canon)==(0 if relative=='404.html' else 1), relative
     if p.refresh:
         # Merged page: meta refresh + canonical must both point at the surviving URL.
@@ -59,18 +63,22 @@ for file in ROOT.rglob('*.html'):
         u=urlsplit(cta['href'])
         expected_host='fe.dtyuedan.cn' if cta['data-product']=='recharge' else 'www.goplus.pro'
         assert u.netloc==expected_host
-        expected={'pro':'/chatgpt-pro-recharge','plus':'/chatgpt-plus-recharge','recharge':'/shop/panghu'}[cta['data-product']]
+        expected={'pro':'/chatgpt-pro-recharge','plus':'/chatgpt-plus-recharge','recharge':'/shop/panghu','site':'/'}[cta['data-product']]
         assert u.path==expected and 'utm_content=' in u.query, (relative,cta)
         assert 'sponsored' in cta.get('rel','')
     for schema in p.schemas:
-        if schema.get('@type')=='BlogPosting':
-            assert schema['mainEntityOfPage']==url and schema['dateModified']>=schema['datePublished']
+        graph=schema.get('@graph',[schema])
+        for node in graph:
+            if node.get('@type')=='Article':
+                assert node['mainEntityOfPage']==url and node['dateModified']>=node['datePublished'], relative
+            if node.get('@type')=='BreadcrumbList':
+                assert node['itemListElement'][-1]['item']==url, ('breadcrumb tail', relative)
 
 for url,p in pages.items():
     if p.refresh: continue
     for href in p.links+p.assets:
         target=urlsplit(urljoin(url,href))
-        if target.netloc!='imi0801.github.io': continue
+        if target.netloc!=urlsplit(BASE).netloc: continue
         assert target.path.startswith(PREFIX), (url,href,'outside project')
         file=ROOT/unquote(target.path[len(PREFIX):])
         if target.path.endswith('/'): file=file/'index.html'
@@ -88,6 +96,6 @@ titles=[p.title for p in pages.values()]
 assert len(set(titles))==len(titles), 'Duplicate titles'
 redirect_targets={p.refresh.split('url=',1)[1].strip() for p in pages.values() if p.refresh}
 assert all(t in pages for t in redirect_targets), ('redirect target missing', redirect_targets-set(pages))
-for route in ['archives/','tags/','categories/','sitemap/']:
+for route in ['archives/','tags/','sitemap/']:
     assert 'noindex' in pages[BASE+route].robots
 print(f'PASS: {len(pages)} HTML pages; {sum(1 for p in pages.values() if p.refresh)} merged redirects; {len(urls)} canonical sitemap URLs; links, fragments, metadata, schemas, CTA destinations.')

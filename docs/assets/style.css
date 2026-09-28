@@ -214,15 +214,23 @@ time { white-space: nowrap; }
 
 /* ---------- Article ---------- */
 .top-promo {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
-  margin: 0 0 18px; padding: 12px 16px;
-  border-radius: var(--radius-sm); background: var(--accent-soft);
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  font-size: 14.5px; line-height: 1.6;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px;
+  margin: 0 0 28px; padding: 22px 26px;
+  border-radius: var(--radius); background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-left: 6px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+  font-size: 16px; line-height: 1.65;
 }
-.top-promo-text { flex: 1 1 320px; color: var(--ink-2); }
-.top-promo-text strong { color: var(--ink); margin-right: 4px; }
+.top-promo-text { flex: 1 1 340px; color: var(--ink-2); }
+.top-promo-title { display: block; margin-bottom: 4px; color: var(--ink); font-size: 21px; line-height: 1.35; }
 .top-promo-link { font-weight: 700; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+.button.large { padding: 14px 30px; font-size: 17px; font-weight: 700; }
+@media (max-width: 640px) {
+  .top-promo { padding: 18px; }
+  .top-promo-title { font-size: 19px; }
+  .top-promo .button.large { width: 100%; }
+}
 .button.small { padding: 7px 14px; font-size: 13px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .top-promo-link { color: var(--accent); } }
 

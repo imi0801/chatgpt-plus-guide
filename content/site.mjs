@@ -35,10 +35,10 @@ export const site = {
   shortName: "ChatGPT 订阅百科",
   updated: "2026-09-19",
   products: {
-    site: { url: "https://www.goplus.pro/", label: "goplus.pro" },
-    recharge: { url: "https://fe.dtyuedan.cn/shop/panghu", label: "自助充值" },
-    plus: { url: "https://www.goplus.pro/chatgpt-plus-recharge", label: "查看 Plus 购买条件" },
-    pro: { url: "https://www.goplus.pro/chatgpt-pro-recharge", label: "咨询 Pro 档位与交付" },
+    site: { url: "https://qfcc99.com/shop/panghu", label: "胖虎小店" },
+    recharge: { url: "https://qfcc99.com/shop/panghu", label: "自助充值" },
+    plus: { url: "https://qfcc99.com/shop/panghu", label: "查看 Plus 购买条件" },
+    pro: { url: "https://qfcc99.com/shop/panghu", label: "咨询 Pro 档位与交付" },
   },
   // Home page: search-intent entry cards. Question first, answer second.
   intents: [

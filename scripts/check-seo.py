@@ -61,9 +61,9 @@ for file in ROOT.rglob('*.html'):
     if relative=='404.html': assert 'noindex' in p.robots
     for cta in p.ctas:
         u=urlsplit(cta['href'])
-        expected_host='fe.dtyuedan.cn' if cta['data-product']=='recharge' else 'www.goplus.pro'
+        expected_host='qfcc99.com'
         assert u.netloc==expected_host
-        expected={'pro':'/chatgpt-pro-recharge','plus':'/chatgpt-plus-recharge','recharge':'/shop/panghu','site':'/'}[cta['data-product']]
+        expected='/shop/panghu'
         assert u.path==expected and 'utm_content=' in u.query, (relative,cta)
         assert 'sponsored' in cta.get('rel','')
     for schema in p.schemas:

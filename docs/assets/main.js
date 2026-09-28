@@ -17,7 +17,7 @@ function trackProductClick(event) {
   if (!link || typeof window.gtag !== 'function') return;
   const url = new URL(link.href, location.href);
   const isProductPage = url.origin === 'https://www.goplus.pro';
-  const isRechargeShop = url.origin === 'https://fe.dtyuedan.cn' && url.pathname === '/shop/panghu';
+  const isRechargeShop = url.origin === 'https://qfcc99.com' && url.pathname === '/shop/panghu';
   if (!isProductPage && !isRechargeShop) return;
   window.gtag('event', 'outbound_click', {
     article_id: document.body.dataset.article,

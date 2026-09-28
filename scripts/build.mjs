@@ -165,7 +165,7 @@ function renderPost(post) {
 
   const tocItems = [...post.sections.map((s, i) => [`#section-${i + 1}`, s.h2]), ...(post.faq?.length ? [['#faq', post.faqHeading || '常见追问']] : []), ...(post.changelog?.length ? [['#changelog', '更新记录']] : [])];
   const tocLinks = tocItems.map(([h, t]) => `<a href="${h}">${esc(t)}</a>`).join('');
-  const topPromo = `<aside class="top-promo" aria-label="推荐服务"><span class="top-promo-text"><strong>没有海外卡、不想折腾？</strong>GoPlus 提供 ChatGPT Plus / Pro 代充，微信、支付宝付款，官网 ${ctaLink('site', post.slug, 'article_top_site', 'top-promo-link')}</span>${ctaLink('recharge', post.slug, 'article_top_recharge', 'button accent small')}</aside>`;
+  const topPromo = `<aside class="top-promo" aria-label="推荐服务"><div class="top-promo-text"><strong class="top-promo-title">没有海外卡、不想折腾？</strong><span>GoPlus 提供 ChatGPT Plus / Pro 代充，微信、支付宝付款，店铺 ${ctaLink('site', post.slug, 'article_top_site', 'top-promo-link')}</span></div>${ctaLink('recharge', post.slug, 'article_top_recharge', 'button accent large')}</aside>`;
   const keyPoints = post.summary?.length ? `<aside class="key-points" aria-label="关键结论"><h2>关键结论</h2><ol>${post.summary.map(s => `<li>${esc(s)}</li>`).join('')}</ol></aside>` : '';
   const faqBlock = post.faq?.length ? `<section class="article-section faq-block" id="faq"><h2>${esc(post.faqHeading || '常见追问')}</h2><dl>${post.faq.map(([q, a]) => `<dt>${esc(q)}</dt><dd>${a}</dd>`).join('')}</dl></section>` : '';
   const changelog = post.changelog?.length ? `<section class="article-section changelog" id="changelog"><h2>更新记录</h2><ul>${post.changelog.map(([d, t]) => `<li><time datetime="${esc(d)}">${esc(d)}</time>：${esc(t)}</li>`).join('')}</ul></section>` : '';

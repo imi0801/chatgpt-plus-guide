@@ -94,13 +94,13 @@ export const site = {
 
 // Category hubs: indexable landing pages with their own intro copy.
 export const categories = [
-  { name: "开通教程", slug: "kaitong", title: "ChatGPT Plus 开通教程", description: "从零开通 ChatGPT Plus：官方网页、手机 App、微信支付宝三种方式的步骤、准备事项与到账确认。", intro: "开通 ChatGPT Plus 只有三条路径：官方网页结算、Apple / Google 应用内订阅、第三方代充。这一组文章按路径拆开讲，每篇先给结论，再给可以照着做的步骤。" },
-  { name: "支付问题", slug: "zhifu", title: "ChatGPT 付款失败与银行卡被拒排查", description: "ChatGPT 付款失败、银行卡被拒绝、付款未获批准、3DS 验证不通过、账单地址填写、虚拟卡限制的逐项排查指南。", intro: "付款失败的处理顺序是：先保存报错原文，再确认钱到底扣没扣，最后看账号计划状态。这一组文章按报错和场景分开，帮你找到该找银行、找官方支持还是找商家。" },
-  { name: "套餐选择", slug: "taocan", title: "ChatGPT 套餐对比：Free、Go、Plus、Pro、Team", description: "ChatGPT 各档套餐的价格、额度与适用人群对比，帮你判断该不该订、订哪一档、什么时候升级。", intro: "多数人的问题不是「Plus 还是 Pro」，而是「现在是不是必须订」。这一组文章按用户类型和使用强度给出判断标准，价格一律以官方结算页为准。" },
-  { name: "账号安全", slug: "zhanghao", title: "ChatGPT 账号安全、取消订阅与退款", description: "ChatGPT 取消订阅、关闭自动续费、申请退款、账号被封、换账号、Session 与代充账号风险的完整说明。", intro: "订阅管理的入口由购买渠道决定，账号风险则取决于你交出了什么。这一组文章覆盖取消、退款、被封、换账号，以及第三方代充需要提交的信息到底意味着什么。" },
-  { name: "ChatGPT 订阅", slug: "dingyue", title: "ChatGPT 订阅指南：Plus、Pro 与发票", description: "ChatGPT Plus 与 Pro 的完整订阅流程、升级前检查、收据下载与报销说明。", intro: "这一组是订阅全流程的主干文章：怎么开、怎么升级、怎么拿收据。碰到具体报错或付款问题，再跳到对应的专题页。" },
-  { name: "常见问题", slug: "wenti", title: "ChatGPT 订阅常见问题", description: "ChatGPT Plus / Pro 订阅的高频问题短答案合集。", intro: "把开通、付款、额度、续费取消和账号安全五类高频问题集中在一起，都给短答案。" },
-  { name: "使用建议", slug: "jianyi", title: "ChatGPT Plus 值不值得买：按人群给结论", description: "学生、上班族、自媒体、程序员分别该不该开 ChatGPT Plus，以及怎么用才回本。", intro: "值不值得买，取决于你的使用强度和场景，不取决于别人的结论。这一组文章按人群拆开，每篇都给出「值得 / 不值得 / 先试免费版」的明确判断。" },
+  { name: "开通教程", slug: "kaitong", title: "ChatGPT Plus 开通教程", description: "从零开通 ChatGPT Plus：官方网页、手机 App、微信支付宝三种方式的步骤、准备事项与到账确认。", intro: "开通 ChatGPT Plus 只有三条路径：官方网页用海外卡结算、Apple 或 Google 应用内订阅、第三方代充。三条路的准备事项、到账时间和能出什么问题都不一样，这一组文章按路径拆开讲，每篇先给结论，再给可以照着做的步骤。第一次开通，先看《ChatGPT Plus 怎么开通》把条件对一遍；想用微信或支付宝付款，直接看《ChatGPT 可以用支付宝吗》；付完钱不确定有没有生效，看《开通后怎么确认成功》。" },
+  { name: "支付问题", slug: "zhifu", title: "ChatGPT 付款失败与银行卡被拒排查", description: "ChatGPT 付款失败、银行卡被拒绝、付款未获批准、3DS 验证不通过、账单地址填写、虚拟卡限制的逐项排查指南。", intro: "付款失败的处理顺序是固定的：先把报错原文保存下来，再确认钱到底扣没扣，最后看账号的计划状态有没有变。顺序反了，很容易重复扣款或者找错对象。这一组文章按报错文案和场景分开，帮你判断该找发卡银行、找 OpenAI 支持还是找商家。不知道从哪开始，先看《ChatGPT 付款失败怎么办》的三步排查；看到具体英文提示，去《付款报错对照表》查原文；银行卡被拒，看《银行卡被拒绝的 8 个原因》。" },
+  { name: "套餐选择", slug: "taocan", title: "ChatGPT 套餐对比：Free、Go、Plus、Pro、Team", description: "ChatGPT 各档套餐的价格、额度与适用人群对比，帮你判断该不该订、订哪一档、什么时候升级。", intro: "多数人真正的问题不是「Plus 还是 Pro」，而是「现在是不是必须订」。ChatGPT 现在有 Free、Go、Plus、Pro、Team 五档，价差从几美元到两百美元，额度和功能的差别却经常被宣传稀释。这一组文章按用户类型和使用强度给出判断标准，价格一律以官方结算页为准。先看《ChatGPT 免费版够不够用》确定要不要花钱，再看《Plus 和 Pro 区别》决定档位，经常撞上限的人直接看《Plus 额度是多少》。" },
+  { name: "账号安全", slug: "zhanghao", title: "ChatGPT 账号安全、取消订阅与退款", description: "ChatGPT 取消订阅、关闭自动续费、申请退款、账号被封、换账号、Session 与代充账号风险的完整说明。", intro: "订阅管理的入口由购买渠道决定，账号风险则取决于你交出了什么。在网页订的要去网页取消，在 App 里订的要去商店管理；第三方代充需要提交的 Session 或登录信息，意味着对方能以你的身份操作账号。这一组文章覆盖取消订阅、关闭自动续费、申请退款、账号被封、换账号，以及代充的交付边界。想停掉扣费先看《自动续费怎么关》，已经被封先看《账号被封了订阅怎么办》，打算找人代充先读《充值账号安全》。" },
+  { name: "ChatGPT 订阅", slug: "dingyue", title: "ChatGPT 订阅指南：Plus、Pro 与发票", description: "ChatGPT Plus 与 Pro 的完整订阅流程、升级前检查、收据下载与报销说明。", intro: "这一组是订阅全流程的主干文章：Plus 怎么开、什么时候该升到 Pro、怎么拿到收据和发票去报销。每篇都按「先确认条件、再操作、最后核对结果」的顺序写，并标注资料核验日期。第一次订阅从《ChatGPT Plus 怎么开通》开始；已经在用 Plus、考虑升级的看《ChatGPT Pro 怎么订阅》；公司报销需要票据的看《ChatGPT 发票怎么开》。碰到具体报错或付款问题，再跳到「支付问题」专题。" },
+  { name: "常见问题", slug: "wenti", title: "ChatGPT 订阅常见问题", description: "ChatGPT Plus / Pro 订阅的高频问题短答案合集。", intro: "把开通、付款、额度、续费取消和账号安全五类高频问题集中在一起，每个问题只给一段能直接用的短答案，并链到对应的长文。适合已经知道自己卡在哪一步、只想快速确认答案的人。如果你的问题在这里没有找到，去「支付问题」或「账号安全」专题按场景查，那两组文章会把每一种报错和处理顺序讲完整。" },
+  { name: "使用建议", slug: "jianyi", title: "ChatGPT Plus 值不值得买：按人群给结论", description: "学生、上班族、自媒体、程序员分别该不该开 ChatGPT Plus，以及怎么用才回本。", intro: "值不值得买，取决于你的使用强度和场景，不取决于别人的结论。同样是每月 20 美元，有人靠它每周省下几小时，有人开了一个月只问过三次问题。这一组文章按学生、上班族、自媒体和程序员拆开，每篇都给出「值得、不值得、先试免费版」三选一的明确判断，并说明怎么用才回本。拿不准先看《ChatGPT Plus 值得买吗》的五类用户结论；学生看《有学生优惠吗》；上班族看《怎么用才能回本》。" },
 ];
 
 export const redirects = new Map([

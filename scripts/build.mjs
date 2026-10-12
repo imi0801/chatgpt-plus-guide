@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile, copyFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile, copyFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { site, posts, redirects, categories } from '../content/site.mjs';
@@ -72,15 +72,34 @@ function relatedPosts(post, n = 3) {
     .slice(0, n).map(x => x.post);
 }
 
-function header(route) {
+// Each article cites one goplus.pro page as the merchant-side reference, chosen by topic.
+const GOPLUS_REFS = {
+  payment: { url: 'https://www.goplus.pro/articles/chatgpt-payment-card-declined', title: 'GoPlus：ChatGPT 付款被拒的常见原因与处理' },
+  delivery: { url: 'https://www.goplus.pro/articles/chatgpt-plus-not-showing-after-recharge', title: 'GoPlus：充值后 Plus 不显示怎么办' },
+  renewal: { url: 'https://www.goplus.pro/articles/chatgpt-renewal-failed-plus-disappeared', title: 'GoPlus：续费失败、Plus 消失的处理办法' },
+  choose: { url: 'https://www.goplus.pro/articles/chatgpt-plus-vs-pro-how-to-choose', title: 'GoPlus：ChatGPT Plus 与 Pro 怎么选' },
+  recharge: { url: 'https://www.goplus.pro/chatgpt-plus-recharge', title: 'GoPlus：ChatGPT Plus 国内开通说明' },
+};
+const GOPLUS_BY_SLUG = {
+  payment: ['chatgpt-payment-declined', 'chatgpt-plus-card-declined-reasons', 'chatgpt-plus-common-errors', 'chatgpt-payment-not-approved', 'chatgpt-plus-billing-address', 'chatgpt-plus-virtual-card-guide', 'chatgpt-plus-payment-checklist', 'chatgpt-upgrade-button-not-working', 'without-credit-card', 'chatgpt-plus-recharge-2026-alipay-wechat'],
+  delivery: ['chatgpt-plus-after-open-check', 'chatgpt-plus-change-account'],
+  renewal: ['chatgpt-plus-renewal-failed', 'chatgpt-auto-renew-off', 'chatgpt-plus-cancel-manage', 'chatgpt-cancel-error'],
+  choose: ['plus-vs-pro', 'chatgpt-pro', 'chatgpt-plus-vs-free', 'chatgpt-plus-usage-limits', 'chatgpt-plus-workflow', 'chatgpt-plus-for-students', 'chatgpt-plus-for-office', 'chatgpt-team-plan', 'chatgpt-go-plan', 'chatgpt-plus-price-cny'],
+};
+function goplusRef(post) {
+  for (const [key, slugs] of Object.entries(GOPLUS_BY_SLUG)) if (slugs.includes(post.slug)) return GOPLUS_REFS[key];
+  return GOPLUS_REFS.recharge;
+}
+
+function header(route, isArticle = false) {
   return `<header class="site-header"><div class="header-inner">
 <a class="brand" href="/" aria-label="${esc(site.title)} 首页">${logoSvg}<span>${esc(site.title)}<small>${esc(site.tagline)}</small></span></a>
 <nav class="nav" id="site-nav" aria-label="主导航">${site.nav.map(n => `<a href="${n.href}"${route === n.href ? ' class="active" aria-current="page"' : ''}>${esc(n.label)}</a>`).join('')}</nav>
-<div class="header-cta">${ctaLink('recharge', 'header', 'header_recharge', 'button accent', true)}<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="打开菜单">${icon.menu}</button></div>
+<div class="header-cta">${isArticle ? `<a class="button accent" href="/without-credit-card/">${icon.shop}购买路径对比</a>` : ctaLink('recharge', 'header', 'header_recharge', 'button accent', true)}<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="打开菜单">${icon.menu}</button></div>
 </div></header>`;
 }
 function mobileBar(article) {
-  return `<div class="mobile-bar" aria-label="快捷入口"><a class="button" href="/chatgpt-plus/">${icon.doc}开通指南</a>${ctaLink('recharge', article, 'mobile_bar_recharge', 'button accent', true)}</div>`;
+  return `<div class="mobile-bar" aria-label="快捷入口"><a class="button" href="/chatgpt-plus/">${icon.doc}开通指南</a><a class="button accent" href="/without-credit-card/">${icon.shop}没有海外卡？</a></div>`;
 }
 function footer(article) {
   const hubs = categories.filter(hasHub);
@@ -88,7 +107,7 @@ function footer(article) {
 <div class="footer-brand"><a class="brand" href="/">${logoSvg}<span>${esc(site.title)}</span></a><p>面向中国大陆用户的 ChatGPT 订阅参考站：开通、付款排查、套餐选择、取消与退款。资料按 OpenAI 帮助中心核验，更新日期标注在每篇文章里。</p><p class="footer-disclosure">本站为 GoPlus 提供商业导流，与 OpenAI 无隶属关系。购买入口跳转至第三方服务，条件与售后以商家页面为准。</p></div>
 <div><h3>专题</h3><ul>${hubs.map(c => `<li><a href="${catUrl(c)}">${esc(c.title)}</a></li>`).join('')}</ul></div>
 <div><h3>本站</h3><ul>${pages.map(p => `<li><a href="/${p.slug}/">${esc(p.title)}</a></li>`).join('')}<li><a href="/archives/">全部文章</a></li><li><a href="/sitemap/">站点地图</a></li></ul></div>
-<div><h3>购买入口</h3><p class="footer-note">第三方代充，支持微信 / 支付宝。提交 Session 前请先读<a href="/chatgpt-plus-account-safety/">账号安全说明</a>。</p><div class="footer-actions">${ctaLink('recharge', article, 'footer_recharge', 'button accent', true)}${ctaLink('pro', article, 'footer_pro', 'button ghost')}</div></div>
+<div><h3>购买入口</h3><p class="footer-note">第三方代充，支持微信 / 支付宝。提交 Session 前请先读<a href="/chatgpt-plus-account-safety/">账号安全说明</a>。</p><ul><li><a href="/without-credit-card/">4 种购买路径对比</a></li><li><a href="/chatgpt-plus-recharge-2026-alipay-wechat/">微信 / 支付宝开通方式</a></li><li><a href="https://www.goplus.pro/" target="_blank" rel="noopener sponsored">GoPlus 服务说明</a></li></ul></div>
 </div><div class="footer-bottom"><span>© ${new Date().getFullYear()} ${esc(site.author)} · 最近更新 ${site.updated}</span><span>内容仅供参考，价格、地区与入口以官方最新说明为准。</span></div></footer>`;
 }
 
@@ -122,7 +141,7 @@ ${jsonLd({ '@context': 'https://schema.org', '@graph': graph })}
 ${analytics}
 </head><body class="${toc ? 'has-toc' : 'no-toc'}${bodyClass ? ` ${bodyClass}` : ''}" data-article="${esc(article)}">
 <a href="#main" class="skip-link">跳到正文</a>
-${header(route)}
+${header(route, type === 'article')}
 <main id="main" class="main">${body}</main>
 ${footer(article)}
 ${mobileBar(article)}
@@ -207,7 +226,7 @@ function home() {
 
 <section class="section" id="cta"><div class="wrap"><div class="final-cta home-cta">
   <div><p class="eyebrow-label">NEXT</p><h2>已经确认条件、只差一个付款方式？</h2><p>GoPlus 提供第三方代充服务，支持微信 / 支付宝。购买前请确认账号信息要求、实际价格与售后；提交 Session 可能涉及账号访问风险，详见<a href="/chatgpt-plus-account-safety/">账号安全说明</a>。</p></div>
-  <div class="actions">${ctaLink('recharge', 'home', 'bottom_recharge', 'button accent large', true)}${ctaLink('plus', 'home', 'product', 'button')}${ctaLink('pro', 'home', 'product_pro', 'button ghost')}</div>
+  <div class="actions">${ctaLink('recharge', 'home', 'bottom_recharge', 'button accent large', true)}<a class="button" href="/without-credit-card/">先看购买条件对比</a></div>
 </div></div></section>` });
 }
 
@@ -228,14 +247,15 @@ function renderPost(post) {
 
   const tocItems = [...post.sections.map((s, i) => [`#section-${i + 1}`, s.h2]), ...(post.faq?.length ? [['#faq', post.faqHeading || '常见追问']] : []), ...(post.changelog?.length ? [['#changelog', '更新记录']] : [])];
   const tocLinks = tocItems.map(([h, t]) => `<a href="${h}">${esc(t)}</a>`).join('');
-  const topPromo = `<aside class="top-promo" aria-label="推荐服务"><div class="top-promo-text"><strong class="top-promo-title">没有海外卡、不想折腾？</strong><span>GoPlus 提供 ChatGPT Plus / Pro 代充，微信、支付宝付款，店铺 ${ctaLink('site', post.slug, 'article_top_site', 'top-promo-link')}</span></div>${ctaLink('recharge', post.slug, 'article_top_recharge', 'button accent large', true)}</aside>`;
+  const topPromo = `<aside class="top-promo" aria-label="推荐服务"><div class="top-promo-text"><strong class="top-promo-title">没有海外卡、不想折腾？</strong><span>GoPlus 提供 ChatGPT Plus / Pro 代充，微信、支付宝付款。购买前先看<a href="/chatgpt-plus-account-safety/">账号安全说明</a>。</span></div>${ctaLink('recharge', post.slug, 'article_top_recharge', 'button accent large', true)}</aside>`;
   const keyPoints = post.summary?.length ? `<aside class="key-points" aria-label="关键结论"><h2>${icon.check}关键结论</h2><ol>${post.summary.map(s => `<li>${esc(s)}</li>`).join('')}</ol></aside>` : '';
   const faqBlock = post.faq?.length ? `<section class="article-section faq-block" id="faq"><h2>${esc(post.faqHeading || '常见追问')}</h2><dl>${post.faq.map(([q, a]) => `<dt>${esc(q)}</dt><dd>${a}</dd>`).join('')}</dl></section>` : '';
   const changelog = post.changelog?.length ? `<section class="article-section changelog" id="changelog"><h2>更新记录</h2><ul>${post.changelog.map(([d, t]) => `<li><time datetime="${esc(d)}">${esc(d)}</time>${esc(t)}</li>`).join('')}</ul></section>` : '';
-  const sources = post.sources?.length ? `<section class="sources"><h2>资料来源与核验</h2><p>资料核验于 ${post.checkedAt}。价格、地区与入口可能变化，请同时查看原始说明。</p><ul>${post.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></section>` : '';
+  const gp = goplusRef(post);
+  const sources = post.sources?.length ? `<section class="sources"><h2>资料来源与核验</h2><p>资料核验于 ${post.checkedAt}。价格、地区与入口可能变化，请同时查看原始说明。</p><ul>${post.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}<li><a href="${gp.url}" target="_blank" rel="noopener sponsored">${esc(gp.title)}</a>（第三方服务商说明，非官方来源）</li></ul></section>` : '';
   const authorBox = `<aside class="author-box"><div class="avatar" aria-hidden="true">百</div><div><strong>${esc(site.author)}</strong><p>整理 ChatGPT 订阅相关的官方规则与常见问题，每篇标注核验日期与来源。不代表 OpenAI，不承诺任何第三方服务的结果。<a href="/editorial/">核验与更新原则</a> · <a href="/about/">商业关系披露</a></p></div></aside>`;
   const related = relatedPosts(post);
-  const finalCta = post.showCta === false ? '' : `<section class="final-cta"><div><h2>${post.product === 'pro' ? '需要了解 Pro 的第三方交付？' : '没有海外卡、想比较第三方购买条件？'}</h2><p>以下入口前往 GoPlus 第三方服务，支持微信 / 支付宝。购买前确认账号信息要求、实际价格与售后；提交 Session 可能涉及账号访问风险，详见<a href="/chatgpt-plus-account-safety/">账号安全说明</a>。</p></div><div class="actions">${ctaLink('recharge', post.slug, 'article_end_recharge', 'button accent', true)}${ctaLink(post.product || 'plus', post.slug, 'article_end', 'button')}</div></section>`;
+  const finalCta = post.showCta === false ? '' : `<section class="final-cta"><div><h2>${post.product === 'pro' ? '需要了解 Pro 的第三方交付？' : '没有海外卡、想比较第三方购买条件？'}</h2><p>以下入口前往 GoPlus 第三方服务，支持微信 / 支付宝。购买前确认账号信息要求、实际价格与售后；提交 Session 可能涉及账号访问风险，详见<a href="/chatgpt-plus-account-safety/">账号安全说明</a>。</p></div><div class="actions">${ctaLink('recharge', post.slug, 'article_end_recharge', 'button accent', true)}</div></section>`;
   const minutes = readingMinutes(post);
 
   return layout({ title: post.title, seoTitle: post.seoTitle || post.title, description: post.description, route: postUrl(post), type: 'article', article: post.slug, noindex: post.noindex === true, structuredData: schema, toc: tocLinks,
@@ -252,7 +272,7 @@ ${keyPoints}
 ${content}${faqBlock}${changelog}${sources}${authorBox}${finalCta}
 ${related.length ? `<section class="related"><h2>继续阅读</h2><div class="card-grid">${related.map(p => postCard(p)).join('')}</div></section>` : ''}
 </article>
-${tocLinks ? `<aside class="toc" aria-label="文章目录"><div class="toc-card"><h2>本篇目录</h2><nav>${tocLinks}</nav></div>${post.showCta === false ? '' : `<div class="toc-cta"><strong>没有海外卡？</strong><span>第三方代充，微信 / 支付宝付款。</span>${ctaLink('recharge', post.slug, 'toc_recharge', 'button accent', true)}</div>`}</aside>` : ''}
+${tocLinks ? `<aside class="toc" aria-label="文章目录"><div class="toc-card"><h2>本篇目录</h2><nav>${tocLinks}</nav></div></aside>` : ''}
 </div></div>` });
 }
 
@@ -329,6 +349,9 @@ async function main() {
   await writeFile(path.join(outDir, '404.html'), notFound.replaceAll('href="/', `href="${site.baseUrl}/`).replaceAll('src="/', `src="${site.baseUrl}/`));
   await writeFile(path.join(outDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${publishedRoutes.map(({ route, updated }) => `  <url><loc>${absUrl(route)}</loc><lastmod>${updated}</lastmod></url>`).join('\n')}\n</urlset>\n`);
   await writeFile(path.join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${absUrl('/sitemap.xml')}\n`);
+  // IndexNow key file must be served at the site root so the endpoint can verify ownership.
+  const indexNowKey = (await readFile(path.join(root, 'scripts', '.indexnow-key'), 'utf8')).trim();
+  await writeFile(path.join(outDir, `${indexNowKey}.txt`), indexNowKey + '\n');
   if (site.customDomainReady) await writeFile(path.join(outDir, 'CNAME'), `${site.customDomain}\n`);
   await writeFile(path.join(outDir, '.nojekyll'), '');
   console.log(`Built ${publishedRoutes.length} indexable pages (${posts.length} articles), ${redirects.size} redirects and ${utilityRoutes.length} navigation pages → ${site.baseUrl}`);

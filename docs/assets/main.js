@@ -1,3 +1,13 @@
+// Mobile navigation toggle
+const navToggle = document.querySelectorAll('.nav-toggle')[0];
+if (navToggle) {
+  navToggle.addEventListener('click', () => {
+    const open = document.body.classList.toggle('nav-open');
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+  });
+}
+
 // TOC highlight
 const headings = [...document.querySelectorAll('.article-section[id]')];
 const tocLinks = [...document.querySelectorAll('.toc a, .mobile-toc a')];

@@ -33,7 +33,7 @@ export const site = {
     { label: "常见问题", href: "/faq/" },
   ],
   shortName: "ChatGPT 订阅百科",
-  updated: "2026-09-19",
+  updated: "2026-10-12",
   products: {
     site: { url: "https://qfcc99.com/shop/panghu", label: "胖虎小店" },
     recharge: { url: "https://qfcc99.com/shop/panghu", label: "自助充值" },
@@ -51,6 +51,38 @@ export const site = {
     ["怎么取消订阅、关自动续费？", "网页、Apple、Google 入口各不同", "chatgpt-plus-cancel-manage"],
     ["扣了款但还是 Free？", "开通后怎么确认成功", "chatgpt-plus-after-open-check"],
   ],
+  // Home page: the three official-or-third-party routes, rendered as path cards. No CNY prices here.
+  paths: [
+    { key: "web", tone: "brand", tag: "官方渠道", title: "官方网页结算", price: "$20 / 月", priceNote: "Plus 官方标价，Pro 从 $100 起，结算页可能另加税费", desc: "在 chatgpt.com 用海外发行的银行卡直接付款，订阅直接挂在你的账号上。", bullets: ["需要海外发行的 Visa / Mastercard 等", "取消与退款走 OpenAI 账单页", "国内发行的卡多数会在支付处理环节被拒"], fit: "有海外卡、账单地址可核对的人", href: "/chatgpt-plus/", more: "开通步骤与到账检查" },
+    { key: "app", tone: "info", tag: "应用商店", title: "Apple / Google 应用内订阅", price: "$19.99 / 月", priceNote: "App Store 标价，是否含税看账单地区", desc: "在 iOS 或 Android 的 ChatGPT App 里升级，钱由 Apple 或 Google 收，订阅状态同步到账号。", bullets: ["可以用对应商店的余额或礼品卡", "取消与退款在商店的订阅管理里操作", "商店账号的地区决定能不能看到升级入口"], fit: "有美区等海外商店账号的手机用户", href: "/chatgpt-plus-mobile-app-vs-web/", more: "App 内订阅和网页订阅的区别" },
+    { key: "merchant", tone: "accent", tag: "第三方代充", title: "人民币付款的第三方代充", price: "微信 / 支付宝", priceNote: "报价由商家公布，本站不维护人民币价格", desc: "把钱付给商家，由商家把订阅开到你的账号上。GoPlus 是本站披露合作的第三方服务。", bullets: ["不需要海外卡，不需要交出密码", "需要提供账号 Session 等信息，先看清风险", "售后与到账时效以商家页面承诺为准"], fit: "没有海外卡、也不想折腾商店账号的人", href: "/without-credit-card/", more: "4 条路径的条件与风险对比", cta: true },
+  ],
+  quickLinks: [
+    ["开通指南", "/chatgpt-plus/"],
+    ["付款失败", "/chatgpt-payment-declined/"],
+    ["微信支付宝", "/chatgpt-plus-recharge-2026-alipay-wechat/"],
+    ["Plus vs Pro", "/plus-vs-pro/"],
+    ["取消与退款", "/chatgpt-plus-cancel-manage/"],
+    ["人民币多少钱", "/chatgpt-plus-price-cny/"],
+  ],
+  steps: [
+    ["保存报错原文", "截图或抄下提示的英文原文和出现时间，不同报错对应完全不同的处理。", "/chatgpt-plus-common-errors/", "报错对照表"],
+    ["确认有没有真的扣款", "银行短信不等于入账，区分预授权冻结和已结算，避免重复下单。", "/chatgpt-payment-declined/", "三步排查"],
+    ["核对账号订阅状态", "登录后看计划显示的是 Free 还是 Plus，App 内购先试恢复购买。", "/chatgpt-plus-after-open-check/", "到账检查"],
+    ["选择处理渠道", "银行拒绝找银行，平台风控找官方支持，第三方购买找商家售后。", "/without-credit-card/", "路径对比"],
+  ],
+  compare: {
+    columns: ["对比维度", "官方网页结算", "应用内订阅", "第三方代充"],
+    rows: [
+      ["需要海外卡", "需要", "需要海外商店账号与余额", "不需要"],
+      ["需要交出密码", "不需要", "不需要", "正规商家不需要，但要提供 Session"],
+      ["价格", "官方标价，可能加税", "商店标价，可能加税", "商家报价，含服务费"],
+      ["取消入口", "OpenAI 账单页", "App Store / Google Play 订阅管理", "按商家说明，通常仍在账号内取消"],
+      ["退款渠道", "OpenAI 支持", "Apple / Google", "商家售后"],
+      ["主要风险", "国内卡被拒、账单地址不符", "商店地区限制、礼品卡来源", "商家可靠性、账号信息交付"],
+      ["适合谁", "有稳定海外支付条件的人", "有海外商店账号的手机用户", "没有海外卡的国内用户"],
+    ],
+  },
   homeFaq: [
     ["中国大陆能开 ChatGPT Plus 吗？", "服务可用地区、付款条件和账号状态要分开核对。截至核验日中国大陆未列入官方支持地区；第三方人民币付款不改变这一条件。"],
     ["ChatGPT Plus 多少钱一个月？", "官方标价每月 20 美元，实际扣款以结算页为准，可能另加当地税费。人民币折算随汇率浮动。"],

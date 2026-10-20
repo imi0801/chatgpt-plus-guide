@@ -1,0 +1,13 @@
+{
+  "name": "chatgpt-plus-pages",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "python3 -m http.server 4173 -d docs",
+    "test": "npm run build && python3 scripts/check-seo.py && node scripts/check-tracking.mjs",
+    "images": "python3 scripts/make-images.py",
+    "indexnow": "node scripts/indexnow.mjs"
+  }
+}

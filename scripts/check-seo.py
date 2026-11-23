@@ -1,7 +1,7 @@
 """Verify generated output at the actual GitHub project URL, without dependencies."""
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit, unquote
+from urllib.parse import urljoin, urlsplit, unquote, parse_qsl
 import json
 import xml.etree.ElementTree as ET
 
@@ -63,7 +63,10 @@ for file in ROOT.rglob('*.html'):
         u=urlsplit(cta['href'])
         expected_host='okai66.com'
         assert u.netloc==expected_host
-        assert u.path in ('/','/plus-price') and not u.query, (relative,cta)
+        q=dict(parse_qsl(u.query))
+        assert u.path in ('/','/plus-price'), (relative,cta)
+        # 购买入口只允许带本站的来源参数，不带别的查询串
+        assert set(q)<={'utm_source','utm_medium','utm_campaign','utm_content'} and q.get('utm_source')=='imi0801-plus-guide' and q.get('utm_medium')=='pages', (relative,cta)
         assert 'sponsored' in cta.get('rel','')
     for schema in p.schemas:
         graph=schema.get('@graph',[schema])

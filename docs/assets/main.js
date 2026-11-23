@@ -24,11 +24,14 @@ if (headings.length && 'IntersectionObserver' in window) {
 function trackProductClick(event) {
   if (event.type === 'auxclick' && event.button !== 1) return;
   const link = event.target.closest?.('a[data-cta][data-product]');
-  if (!link || typeof window.gtag !== 'function') return;
+  if (!link) return;
   const url = new URL(link.href, location.href);
   const isProductPage = url.origin === 'https://okai66.com';
   const isRechargeShop = url.origin === 'https://okai66.com';
   if (!isProductPage && !isRechargeShop) return;
+  // Same click, also recorded in self-hosted Umami when its script has loaded.
+  try { window.umami?.track('okai66_click', { to: url.pathname, from: location.pathname, cta: link.dataset.cta }); } catch (_) {}
+  if (typeof window.gtag !== 'function') return;
   window.gtag('event', 'outbound_click', {
     article_id: document.body.dataset.article,
     cta_position: link.dataset.cta,

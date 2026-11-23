@@ -117,6 +117,7 @@ function layout({ title, seoTitle, description = site.description, route = '/', 
     site.bingSiteVerification && `<meta name="msvalidate.01" content="${esc(site.bingSiteVerification)}">`,
     site.baiduSiteVerification && `<meta name="baidu-site-verification" content="${esc(site.baiduSiteVerification)}">`,
   ].filter(Boolean).join('\n');
+  const umami = site.umamiWebsiteId ? `<script defer src="https://abc.okai66.com/script.js" data-website-id="${esc(site.umamiWebsiteId)}" data-domains="${esc(site.domain)}"></script>` : '';
   const graph = [orgSchema, siteSchema, ...structuredData];
   return `<!doctype html>
 <html lang="zh-CN"><head>
@@ -135,6 +136,7 @@ ${extraHead}
 ${jsonLd({ '@context': 'https://schema.org', '@graph': graph })}
 <link rel="stylesheet" href="/assets/style.css"><script defer src="/assets/main.js"></script>
 ${analytics}
+${umami}
 </head><body class="${toc ? 'has-toc' : 'no-toc'}${bodyClass ? ` ${bodyClass}` : ''}" data-article="${esc(article)}">
 <a href="#main" class="skip-link">跳到正文</a>
 ${header(route, type === 'article')}
@@ -298,10 +300,25 @@ function utilityPage(route) {
   return layout({ title, route, noindex: true, article: 'navigation', body: `<div class="wrap"><section class="page"><h1>${title}</h1>${body}</section></div>` });
 }
 
+// Stamp every okai66.com link with this site's utm_source so OKAI66 analytics can tell the sites apart.
+// utm_campaign = the page the link sits on; utm_content = the CTA position when the link has one.
+function tagOutbound(route, html) {
+  if (!site.utmSource) return html;
+  const campaign = route.split('/').filter(Boolean).join('-') || 'home';
+  return html.replace(/<a\b[^>]*\bhref="(https:\/\/okai66\.com[^"]*)"[^>]*>/g, (tag, href) => {
+    const url = new URL(href.replaceAll('&amp;', '&'));
+    url.searchParams.set('utm_source', site.utmSource);
+    url.searchParams.set('utm_medium', 'pages');
+    if (!url.searchParams.has('utm_campaign')) url.searchParams.set('utm_campaign', campaign);
+    const cta = tag.match(/data-cta="([^"]+)"/)?.[1];
+    if (cta) url.searchParams.set('utm_content', cta);
+    return tag.replace(`href="${href}"`, `href="${esc(url.href)}"`);
+  });
+}
 function portableHtml(route, html) {
   const depth = route.split('/').filter(Boolean).length;
   const prefix = depth ? '../'.repeat(depth) : './';
-  return html.replaceAll('href="/', `href="${prefix}`).replaceAll('src="/', `src="${prefix}`);
+  return tagOutbound(route, html).replaceAll('href="/', `href="${prefix}`).replaceAll('src="/', `src="${prefix}`);
 }
 async function writePage(route, html, updated, indexable = true) {
   const dir = path.join(outDir, route.replace(/^\//, ''));
@@ -342,7 +359,7 @@ async function main() {
   for (const [slug, { target, title }] of redirects) await writeRedirect(slug, target, title);
   for (const route of utilityRoutes) await writePage(route, utilityPage(route), site.updated, false);
   const notFound = layout({ title: '页面不存在', description: '此页面不存在，请回到指南首页。', route: '/404.html', canonical: false, noindex: true, article: '404', body: '<div class="wrap"><section class="page not-found"><h1>页面不存在</h1><p>请检查网址，或从首页按问题找答案。</p><a class="button primary" href="/">返回首页</a></section></div>' });
-  await writeFile(path.join(outDir, '404.html'), notFound.replaceAll('href="/', `href="${site.baseUrl}/`).replaceAll('src="/', `src="${site.baseUrl}/`));
+  await writeFile(path.join(outDir, '404.html'), tagOutbound('/404', notFound).replaceAll('href="/', `href="${site.baseUrl}/`).replaceAll('src="/', `src="${site.baseUrl}/`));
   await writeFile(path.join(outDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${publishedRoutes.map(({ route, updated }) => `  <url><loc>${absUrl(route)}</loc><lastmod>${updated}</lastmod></url>`).join('\n')}\n</urlset>\n`);
   await writeFile(path.join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${absUrl('/sitemap.xml')}\n`);
   // IndexNow key file must be served at the site root so the endpoint can verify ownership.

@@ -23,6 +23,10 @@ export const site = {
   bingSiteVerification: "",   // Bing Webmaster → 添加站点 → HTML meta 方式，把 content 值填到这里
   baiduSiteVerification: "",  // 百度站长平台 → HTML 标签验证
   googleAnalyticsId: "G-V3XLJMGEV5",
+  // 自建 Umami（abc.okai66.com）里本站的 website id；留空则不加载。
+  umamiWebsiteId: "eb32ecd9-ff63-4522-9975-73d2c4e0783f",
+  // 链到 okai66.com 的链接统一带这个来源名，OKAI66 那边按站区分流量。
+  utmSource: "imi0801-plus-guide",
   nav: [
     { label: "首页", href: "/" },
     { label: "开通指南", href: "/chatgpt-plus/" },

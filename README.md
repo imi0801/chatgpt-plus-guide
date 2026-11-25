@@ -41,7 +41,7 @@ ChatGPT Plus / Pro 订阅问题的中文参考站，每篇文章只解决一个�
 - [ChatGPT Plus 人民币多少钱？税费、汇率与报价怎么算](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-plus-price-cny/)
 - [ChatGPT Plus 额度是多少？每天会刷新吗，每周限制怎么算](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-plus-usage-limits/)
 - [ChatGPT Plus 和 Pro 区别：价格、额度与什么时候该升级](https://imi0801.github.io/chatgpt-plus-guide/plus-vs-pro/)
-- [ChatGPT Pro 怎么订阅？两个档位的区别、费用与升级前检查](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-pro/)
+- [ChatGPT Pro 怎么订阅？三个档位的区别、费用与升级前检查](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-pro/)
 - [ChatGPT Go 是什么？和 Plus 的区别、国内能不能买](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-go-plan/)
 - [ChatGPT 免费版够不够用？什么时候值得开 Plus](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-plus-vs-free/)
 - [ChatGPT Plus 值得买吗？按 5 类用户给出结论](https://imi0801.github.io/chatgpt-plus-guide/chatgpt-plus-workflow/)
